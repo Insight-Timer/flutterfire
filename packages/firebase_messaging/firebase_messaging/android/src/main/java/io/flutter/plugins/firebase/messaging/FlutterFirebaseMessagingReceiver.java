@@ -10,11 +10,15 @@ import android.content.Intent;
 import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.firebase.messaging.RemoteMessage;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
   private static final String TAG = "FLTFireMsgReceiver";
   static HashMap<String, RemoteMessage> notifications = new HashMap<>();
+  private static boolean suspendNotification = false;
+  private static Map<String, String> suspendNotificationMessageFilters;
 
   @Override
   public void onReceive(Context context, Intent intent) {
@@ -29,6 +33,16 @@ public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
     if (remoteMessage.getNotification() != null) {
       notifications.put(remoteMessage.getMessageId(), remoteMessage);
       FlutterFirebaseMessagingStore.getInstance().storeFirebaseMessage(remoteMessage);
+    }
+
+    if (shouldSuspendBrazeNotification(remoteMessage)) {
+      Log.i(TAG, "Braze message detected! but notification is suspended.");
+      return;
+    }
+
+    if (isHandledByBraze(remoteMessage)) {
+      Log.i(TAG, "Braze message detected! returning...");
+      return;
     }
 
     //  |-> ---------------------
@@ -50,5 +64,98 @@ public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
         FlutterFirebaseMessagingUtils.EXTRA_REMOTE_MESSAGE, remoteMessage);
     FlutterFirebaseMessagingBackgroundService.enqueueMessageProcessing(
         context, onBackgroundMessageIntent);
+  }
+
+  public static void setSuspendNotification(boolean suspend, Map<String, String> filters) {
+    suspendNotification = suspend;
+    suspendNotificationMessageFilters = filters;
+  }
+
+  /**
+   * This method is used to handle braze related messages via reflection.
+   *
+   * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
+   * @return Wether the message was handled by braze or not.
+   */
+  private Boolean isHandledByBraze(final RemoteMessage remoteMessage) {
+    Method method;
+    Boolean isHandled = false;
+
+    try {
+      Class brazeMessagingService = Class.forName("com.appboy.AppboyFirebaseMessagingService");
+      method =
+          brazeMessagingService.getMethod(
+              "handleBrazeRemoteMessage", Context.class, RemoteMessage.class);
+
+      isHandled = (Boolean) method.invoke(brazeMessagingService, this, remoteMessage);
+
+    } catch (NoSuchMethodException noSuchMethodException) {
+      Log.e(TAG, "method doesn't exist", noSuchMethodException);
+    } catch (Exception exception) {
+      Log.e(TAG, "something went wrong", exception);
+    }
+
+    return isHandled;
+  }
+
+  /**
+   * This method is used to check that remote message is braze related messages via reflection.
+   *
+   * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
+   * @return Wether the message is for braze or not.
+   */
+  private Boolean isBrazePushNotification(final RemoteMessage remoteMessage) {
+    Method method;
+    Boolean isBraze = false;
+
+    try {
+      Class brazeMessagingService = Class.forName("com.appboy.AppboyFirebaseMessagingService");
+      method = brazeMessagingService.getMethod("isBrazePushNotification", RemoteMessage.class);
+      isBraze = (Boolean) method.invoke(brazeMessagingService, remoteMessage);
+    } catch (NoSuchMethodException noSuchMethodException) {
+      Log.e(TAG, "method doesn't exist", noSuchMethodException);
+    } catch (Exception exception) {
+      Log.e(TAG, "something went wrong", exception);
+    }
+
+    return isBraze;
+  }
+
+  /**
+   * This method is used whether to suspend the braze notification based on the message filter given
+   * by caller.
+   *
+   * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
+   * @return Wether the message is suspended or not
+   */
+  private Boolean shouldSuspendBrazeNotification(final RemoteMessage remoteMessage) {
+    if (isBrazePushNotification(remoteMessage)
+        && isApplicationForeground(this)
+        && suspendNotification) {
+
+      final Map<String, String> remoteMessageData = remoteMessage.getData();
+
+      if (remoteMessageData == null || remoteMessageData.isEmpty()) {
+        Log.i(TAG, "Remote message data from FCM was null. returning ...");
+        return true;
+      }
+
+      if (suspendNotificationMessageFilters != null
+          && !suspendNotificationMessageFilters.isEmpty()) {
+        for (String key : suspendNotificationMessageFilters.keySet()) {
+          final String val = suspendNotificationMessageFilters.get(key);
+          if (remoteMessageData.containsKey(key) && val != null && !val.isEmpty()) {
+            final String data = remoteMessageData.get(key);
+            if (data != null && data.contains(val)) {
+              return true;
+            }
+          }
+        }
+      } else {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

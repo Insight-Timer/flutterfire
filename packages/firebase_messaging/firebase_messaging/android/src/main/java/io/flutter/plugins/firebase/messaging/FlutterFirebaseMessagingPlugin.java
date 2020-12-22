@@ -345,6 +345,15 @@ public class FlutterFirebaseMessagingPlugin extends BroadcastReceiver
       case "Messaging#setAutoInitEnabled":
         methodCallTask = setAutoInitEnabled(call.arguments());
         break;
+      case "Messaging#suspendNotification":
+        Map<String, String> filters = ((Map<String, String>) call.arguments);
+        FlutterFirebaseMessagingReceiver.setSuspendNotification(true, filters);
+        result.success(null);
+        break;
+      case "Messaging#resumeNotification":
+        FlutterFirebaseMessagingReceiver.setSuspendNotification(false, null);
+        result.success(null);
+        break;
       default:
         result.notImplemented();
         return;

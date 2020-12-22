@@ -357,6 +357,18 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   Future<bool> autoInitEnabled() async {
     return isAutoInitEnabled;
   }
+
+  /// suspend notification (android only)
+  /// only handle braze notification for suspension
+  Future<void> suspendNotification({Map<String, String> messageFilters}) async {
+    await _delegate.suspendNotification(messageFilters: messageFilters);
+  }
+
+  /// resume notification (android only)
+  /// only handle braze notification for suspension
+  Future<void> resumeNotification() async {
+    await _delegate.resumeNotification();
+  }
 }
 
 _assertTopicName(String topic) {
