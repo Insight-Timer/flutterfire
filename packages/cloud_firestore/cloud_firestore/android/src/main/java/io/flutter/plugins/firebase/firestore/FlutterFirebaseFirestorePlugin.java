@@ -318,12 +318,16 @@ public class FlutterFirebaseFirestorePlugin
                       exceptionMap.put("code", firestoreException.getCode());
                       exceptionMap.put("message", firestoreException.getMessage());
                       querySnapshotMap.put("error", exceptionMap);
+                      if (channel != null) {
+                        channel.invokeMethod("QuerySnapshot#error", querySnapshotMap);
+                      }
 
-                      channel.invokeMethod("QuerySnapshot#error", querySnapshotMap);
                     } else {
                       //noinspection ConstantConditions
                       querySnapshotMap.put("snapshot", querySnapshot);
-                      channel.invokeMethod("QuerySnapshot#event", querySnapshotMap);
+                      if (channel != null) {
+                        channel.invokeMethod("QuerySnapshot#event", querySnapshotMap);
+                      }
                     }
                   });
 
@@ -379,10 +383,14 @@ public class FlutterFirebaseFirestorePlugin
                       exceptionMap.put("code", firestoreException.getCode());
                       exceptionMap.put("message", firestoreException.getMessage());
                       eventMap.put("error", exceptionMap);
-                      channel.invokeMethod("DocumentSnapshot#error", eventMap);
+                      if (channel != null) {
+                        channel.invokeMethod("DocumentSnapshot#error", eventMap);
+                      }
                     } else {
                       eventMap.put("snapshot", documentSnapshot);
-                      channel.invokeMethod("DocumentSnapshot#event", eventMap);
+                      if (channel != null) {
+                        channel.invokeMethod("DocumentSnapshot#event", eventMap);
+                      }
                     }
                   });
 
