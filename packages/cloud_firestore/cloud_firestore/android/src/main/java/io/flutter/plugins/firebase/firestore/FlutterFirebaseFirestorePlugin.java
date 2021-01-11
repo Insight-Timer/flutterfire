@@ -133,11 +133,14 @@ public class FlutterFirebaseFirestorePlugin
   // is detached from the FlutterEngine
   private void removeEventListeners() {
     for (int i = 0; i < listenerRegistrations.size(); i++) {
-      int key = listenerRegistrations.keyAt(i);
-      ListenerRegistration listenerRegistration = listenerRegistrations.get(key);
+      int keyExists = listenerRegistrations.indexOfKey(i);
+      if(keyExists >= 0) {
+        int key = listenerRegistrations.keyAt(i);
+        ListenerRegistration listenerRegistration = listenerRegistrations.get(key);
 
-      if (listenerRegistration != null) {
-        listenerRegistration.remove();
+        if (listenerRegistration != null) {
+          listenerRegistration.remove();
+        }
       }
     }
     listenerRegistrations.clear();
