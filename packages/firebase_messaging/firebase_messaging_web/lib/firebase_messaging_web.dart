@@ -7,8 +7,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging_platform_interface/firebase_messaging_platform_interface.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:firebase_core_web/firebase_core_web_interop.dart'
-    as core_interop;
+import 'package:firebase_core_web/firebase_core_web_interop.dart' as core_interop;
 
 import 'src/interop/messaging.dart' as messaging_interop;
 import 'src/interop/notification.dart';
@@ -32,15 +31,12 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
   /// Builds an instance of [FirebaseMessagingWeb] with an optional [FirebaseApp] instance
   /// If [app] is null then the created instance will use the default [FirebaseApp]
   FirebaseMessagingWeb({FirebaseApp app})
-      : _webMessaging =
-            messaging_interop.getMessagingInstance(core_interop.app(app?.name)),
+      : _webMessaging = messaging_interop.getMessagingInstance(core_interop.app(app?.name)),
         super(appInstance: app) {
     if (app != null && _initialized) return;
 
-    _webMessaging.onMessage
-        .listen((messaging_interop.MessagePayload webMessagePayload) {
-      RemoteMessage remoteMessage =
-          RemoteMessage.fromMap(utils.messagePayloadToMap(webMessagePayload));
+    _webMessaging.onMessage.listen((messaging_interop.MessagePayload webMessagePayload) {
+      RemoteMessage remoteMessage = RemoteMessage.fromMap(utils.messagePayloadToMap(webMessagePayload));
       FirebaseMessagingPlatform.onMessage.add(remoteMessage);
     });
 
@@ -103,8 +99,7 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
     // onTokenRefresh is deprecated on web, however since this is a non-critical
     // api we just return a noop stream to keep functionality the same across
     // platforms.
-    return _noopOnTokenRefreshStream ??=
-        StreamController<String>.broadcast().stream;
+    return _noopOnTokenRefreshStream ??= StreamController<String>.broadcast().stream;
   }
 
   @override
@@ -136,8 +131,7 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
   }
 
   @override
-  Future<void> setForegroundNotificationPresentationOptions(
-      {bool alert, bool badge, bool sound}) async {
+  Future<void> setForegroundNotificationPresentationOptions({bool alert, bool badge, bool sound}) async {
     return;
   }
 
@@ -163,5 +157,15 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
 
       https://firebase.google.com/docs/cloud-messaging/js/topic-messaging
     ''');
+  }
+
+  @override
+  Future<void> suspendNotification({Map<String, String> messageFilters}) {
+    throw UnimplementedError('suspendNotification() is not implemented');
+  }
+
+  @override
+  Future<void> resumeNotification() {
+    throw UnimplementedError('resumeNotification() is not implemented');
   }
 }
