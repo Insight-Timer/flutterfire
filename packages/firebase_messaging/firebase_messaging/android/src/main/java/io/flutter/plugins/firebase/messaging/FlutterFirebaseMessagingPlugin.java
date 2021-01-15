@@ -349,11 +349,11 @@ public class FlutterFirebaseMessagingPlugin extends BroadcastReceiver
         Map<String, String> filters = ((Map<String, String>) call.arguments);
         FlutterFirebaseMessagingReceiver.setSuspendNotification(true, filters);
         result.success(null);
-        break;
+        return;
       case "Messaging#resumeNotification":
         FlutterFirebaseMessagingReceiver.setSuspendNotification(false, null);
         result.success(null);
-        break;
+        return;
       default:
         result.notImplemented();
         return;
