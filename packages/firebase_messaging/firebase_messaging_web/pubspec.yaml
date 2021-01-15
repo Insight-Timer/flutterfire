@@ -18,7 +18,7 @@ dependencies:
   meta: ^1.1.7
   firebase_core: ^0.5.3
   firebase_core_web: ^0.2.0
-  firebase_messaging_platform_interface: ^1.0.0-dev.7
+  firebase_messaging_platform_interface: ^1.0.0-dev.8
   js: ^0.6.1
   service_worker: ^0.2.4
 
