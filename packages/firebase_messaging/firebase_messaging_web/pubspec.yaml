@@ -22,10 +22,6 @@ dependencies:
   js: ^0.6.1
   service_worker: ^0.2.4
 
-dependency_overrides:
-  firebase_messaging_platform_interface:
-    path: ../firebase_messaging_platform_interface
-
 dev_dependencies:
   pedantic: ^1.8.0
   flutter_test:
