@@ -29,6 +29,8 @@ public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
 
     RemoteMessage remoteMessage = new RemoteMessage(intent.getExtras());
 
+    printRemoteMessageData(remoteMessage);
+
     // Store the RemoteMessage if the message contains a notification payload.
     if (remoteMessage.getNotification() != null) {
       notifications.put(remoteMessage.getMessageId(), remoteMessage);
@@ -158,5 +160,26 @@ public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
     }
 
     return false;
+  }
+
+  private void printRemoteMessageData(final RemoteMessage remoteMessage) {
+     final Map<String, String> remoteMessageData = remoteMessage.getData();
+
+     if (remoteMessage.getNotification() != null) {
+       Log.i(TAG, "Remote message contains notification");
+       Log.i(TAG, "Remote notification body: " + remoteMessage.getNotification().getBody());
+     }
+
+     if (remoteMessageData == null || remoteMessageData.isEmpty()) {
+       Log.i(TAG, "Remote message data from FCM was null. returning ...");
+       return;
+     }
+
+     for (String key : remoteMessageData.keySet()) {
+      final String val = remoteMessageData.get(key);
+      if (val != null && !val.isEmpty()) {
+         Log.i(TAG, "Remote message data key: " + key + " value: " + val);
+      }
+    }
   }
 }
