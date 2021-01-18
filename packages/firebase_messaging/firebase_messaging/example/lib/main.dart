@@ -39,8 +39,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 );
 
 /// Initalize the [FlutterLocalNotificationsPlugin] package.
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,8 +53,7 @@ void main() async {
   /// We use this channel in the `AndroidManifest.xml` file to override the
   /// default FCM channel to enable heads up notifications.
   await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
   /// Update the iOS foreground notification presentation options to allow
@@ -65,6 +63,9 @@ void main() async {
     badge: true,
     sound: true,
   );
+
+  await FirebaseMessaging.instance.suspendNotification();
+  await FirebaseMessaging.instance.resumeNotification();
 
   runApp(MessagingExampleApp());
 }
@@ -115,12 +116,9 @@ class _Application extends State<Application> {
   @override
   void initState() {
     super.initState();
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((RemoteMessage message) {
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage message) {
       if (message != null) {
-        Navigator.pushNamed(context, '/message',
-            arguments: MessageArguments(message, true));
+        Navigator.pushNamed(context, '/message', arguments: MessageArguments(message, true));
       }
     });
 
@@ -148,8 +146,7 @@ class _Application extends State<Application> {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
-      Navigator.pushNamed(context, '/message',
-          arguments: MessageArguments(message, true));
+      Navigator.pushNamed(context, '/message', arguments: MessageArguments(message, true));
     });
   }
 
@@ -177,32 +174,26 @@ class _Application extends State<Application> {
     switch (value) {
       case 'subscribe':
         {
-          print(
-              'FlutterFire Messaging Example: Subscribing to topic "fcm_test".');
+          print('FlutterFire Messaging Example: Subscribing to topic "fcm_test".');
           await FirebaseMessaging.instance.subscribeToTopic('fcm_test');
-          print(
-              'FlutterFire Messaging Example: Subscribing to topic "fcm_test" successful.');
+          print('FlutterFire Messaging Example: Subscribing to topic "fcm_test" successful.');
         }
         break;
       case 'unsubscribe':
         {
-          print(
-              'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test".');
+          print('FlutterFire Messaging Example: Unsubscribing from topic "fcm_test".');
           await FirebaseMessaging.instance.unsubscribeFromTopic('fcm_test');
-          print(
-              'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test" successful.');
+          print('FlutterFire Messaging Example: Unsubscribing from topic "fcm_test" successful.');
         }
         break;
       case 'get_apns_token':
         {
-          if (defaultTargetPlatform == TargetPlatform.iOS ||
-              defaultTargetPlatform == TargetPlatform.macOS) {
+          if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
             print('FlutterFire Messaging Example: Getting APNs token...');
             String token = await FirebaseMessaging.instance.getAPNSToken();
             print('FlutterFire Messaging Example: Got APNs token: $token');
           } else {
-            print(
-                'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.');
+            print('FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.');
           }
         }
         break;
@@ -250,9 +241,7 @@ class _Application extends State<Application> {
           MetaCard("Permissions", Permissions()),
           MetaCard("FCM Token", TokenMonitor((token) {
             _token = token;
-            return token == null
-                ? CircularProgressIndicator()
-                : Text(token, style: TextStyle(fontSize: 12));
+            return token == null ? CircularProgressIndicator() : Text(token, style: TextStyle(fontSize: 12));
           })),
           MetaCard("Message Stream", MessageList()),
         ]),
@@ -278,9 +267,7 @@ class MetaCard extends StatelessWidget {
             child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(children: [
-                  Container(
-                      margin: EdgeInsets.only(bottom: 16),
-                      child: Text(_title, style: TextStyle(fontSize: 18))),
+                  Container(margin: EdgeInsets.only(bottom: 16), child: Text(_title, style: TextStyle(fontSize: 18))),
                   _children,
                 ]))));
   }
