@@ -377,4 +377,30 @@ class MethodChannelFirebaseMessaging extends FirebaseMessagingPlatform {
       throw convertPlatformException(e);
     }
   }
+
+  @override
+  Future<void> suspendNotification({Map<String, String> messageFilters}) async {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    }
+
+    try {
+      await channel.invokeMapMethod(
+          'Messaging#suspendNotification', messageFilters);
+    } catch (e) {
+      throw convertPlatformException(e);
+    }
+  }
+
+  @override
+  Future<void> resumeNotification() async {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    }
+    try {
+      await channel.invokeMapMethod('Messaging#resumeNotification');
+    } catch (e) {
+      throw convertPlatformException(e);
+    }
+  }
 }

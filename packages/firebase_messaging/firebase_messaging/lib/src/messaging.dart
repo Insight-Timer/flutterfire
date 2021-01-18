@@ -15,8 +15,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
 
   FirebaseMessagingPlatform get _delegate {
     if (_delegatePackingProperty == null) {
-      _delegatePackingProperty = FirebaseMessagingPlatform.instanceFor(
-          app: app, pluginConstants: pluginConstants);
+      _delegatePackingProperty = FirebaseMessagingPlatform.instanceFor(app: app, pluginConstants: pluginConstants);
     }
     return _delegatePackingProperty;
   }
@@ -24,8 +23,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   /// The [FirebaseApp] for this current [FirebaseMessaging] instance.
   FirebaseApp app;
 
-  FirebaseMessaging._({this.app})
-      : super(app.name, 'plugins.flutter.io/firebase_messaging');
+  FirebaseMessaging._({this.app}) : super(app.name, 'plugins.flutter.io/firebase_messaging');
 
   /// Returns an instance using the default [FirebaseApp].
   static FirebaseMessaging get instance {
@@ -63,8 +61,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   /// To handle messages whilst the app is in the background or terminated,
   /// see [onBackgroundMessage].
   static Stream<RemoteMessage> get onMessage {
-    Stream<RemoteMessage> onMessageStream =
-        FirebaseMessagingPlatform.onMessage.stream;
+    Stream<RemoteMessage> onMessageStream = FirebaseMessagingPlatform.onMessage.stream;
 
     StreamController<RemoteMessage> streamController;
     streamController = StreamController<RemoteMessage>.broadcast(onListen: () {
@@ -83,8 +80,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   /// If your app is opened via a notification whilst the app is terminated,
   /// see [getInitialMessage].
   static Stream<RemoteMessage> get onMessageOpenedApp {
-    Stream<RemoteMessage> onMessageOpenedAppStream =
-        FirebaseMessagingPlatform.onMessageOpenedApp.stream;
+    Stream<RemoteMessage> onMessageOpenedAppStream = FirebaseMessagingPlatform.onMessageOpenedApp.stream;
 
     StreamController<RemoteMessage> streamController;
     streamController = StreamController<RemoteMessage>.broadcast(onListen: () {
@@ -104,8 +100,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   }
 
   // ignore: public_member_api_docs
-  @Deprecated(
-      "Constructing Messaging is deprecated, use 'FirebaseMessaging.instance' instead")
+  @Deprecated("Constructing Messaging is deprecated, use 'FirebaseMessaging.instance' instead")
   factory FirebaseMessaging() {
     return FirebaseMessaging.instance;
   }
@@ -242,10 +237,8 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   ///
   /// On Web, a popup requesting the users permission is shown using the native
   /// browser API.
-  @Deprecated(
-      "requestNotificationPermissions() is deprecated in favor of requestPermission()")
-  Future<bool> requestNotificationPermissions(
-      [IosNotificationSettings iosSettings]) async {
+  @Deprecated("requestNotificationPermissions() is deprecated in favor of requestPermission()")
+  Future<bool> requestNotificationPermissions([IosNotificationSettings iosSettings]) async {
     iosSettings ??= const IosNotificationSettings();
     AuthorizationStatus status = (await requestPermission(
       sound: iosSettings.sound,
@@ -255,8 +248,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
     ))
         .authorizationStatus;
 
-    return status == AuthorizationStatus.authorized ||
-        status == AuthorizationStatus.provisional;
+    return status == AuthorizationStatus.authorized || status == AuthorizationStatus.provisional;
   }
 
   /// Send a new [RemoteMessage] to the FCM server. Android only.
@@ -352,10 +344,21 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   }
 
   /// Determine whether FCM auto-initialization is enabled or disabled.
-  @Deprecated(
-      "autoInitEnabled() is deprecated. Use [isAutoInitEnabled] instead")
+  @Deprecated("autoInitEnabled() is deprecated. Use [isAutoInitEnabled] instead")
   Future<bool> autoInitEnabled() async {
     return isAutoInitEnabled;
+  }
+
+  /// suspend notification (android only)
+  /// only handle braze notification for suspension
+  Future<void> suspendNotification({Map<String, String> messageFilters}) async {
+    await _delegate.suspendNotification(messageFilters: messageFilters);
+  }
+
+  /// resume notification (android only)
+  /// only handle braze notification for suspension
+  Future<void> resumeNotification() async {
+    await _delegate.resumeNotification();
   }
 }
 
