@@ -132,17 +132,22 @@ public class FlutterFirebaseFirestorePlugin
   // Ensure any Firestore listeners are removed when the app
   // is detached from the FlutterEngine
   private void removeEventListeners() {
-    for (int i = 0; i < listenerRegistrations.size(); i++) {
-      try {
-        int key = listenerRegistrations.keyAt(i);
-        ListenerRegistration listenerRegistration = listenerRegistrations.get(key);
+    try {
+      int size = listenerRegistrations.size();
+      for (int i = 0; i < size; i++) {
+        try {
+          int key = listenerRegistrations.keyAt(i);
+          ListenerRegistration listenerRegistration = listenerRegistrations.get(key);
 
-        if (listenerRegistration != null) {
-          listenerRegistration.remove();
+          if (listenerRegistration != null) {
+            listenerRegistration.remove();
+          }
+        } catch (ArrayIndexOutOfBoundsException e) {
+
         }
-      } catch (ArrayIndexOutOfBoundsException e) {
-
       }
+    } catch (ArrayIndexOutOfBoundsException e) {
+
     }
     listenerRegistrations.clear();
   }
