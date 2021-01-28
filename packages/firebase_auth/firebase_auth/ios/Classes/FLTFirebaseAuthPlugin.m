@@ -1281,8 +1281,7 @@ BOOL static initialAuthState = true;
   userData[@"isAnonymous"] = @(user.isAnonymous);
   userData[@"emailVerified"] = @(user.isEmailVerified);
 
-  // native does not provide refresh tokens
-  userData[@"refreshToken"] = @"";
+  userData[@"refreshToken"] = user.refreshToken;
   return userData;
 }
 
