@@ -372,10 +372,14 @@ public class FlutterFirebaseAuthPlugin
     output.put(Constants.EMAIL, firebaseUser.getEmail());
     output.put(Constants.EMAIL_VERIFIED, firebaseUser.isEmailVerified());
     output.put(Constants.IS_ANONYMOUS, firebaseUser.isAnonymous());
+
+    // TODO(Salakar): add an integration test to check for null, if possible
+    // See https://github.com/FirebaseExtended/flutterfire/issues/3643
     final FirebaseUserMetadata userMetadata = firebaseUser.getMetadata();
     if (userMetadata != null) {
-      metadata.put(Constants.CREATION_TIME, userMetadata.getCreationTimestamp());
-      metadata.put(Constants.LAST_SIGN_IN_TIME, userMetadata.getLastSignInTimestamp());
+      metadata.put(Constants.CREATION_TIME, firebaseUser.getMetadata().getCreationTimestamp());
+      metadata.put(
+          Constants.LAST_SIGN_IN_TIME, firebaseUser.getMetadata().getLastSignInTimestamp());
     }
     output.put(Constants.METADATA, metadata);
     output.put(Constants.PHONE_NUMBER, firebaseUser.getPhoneNumber());
@@ -756,6 +760,18 @@ public class FlutterFirebaseAuthPlugin
         () -> {
           FirebaseAuth firebaseAuth = getAuth(arguments);
           firebaseAuth.signOut();
+          return null;
+        });
+  }
+
+  private Task<Void> useEmulator(Map<String, Object> arguments) {
+    return Tasks.call(
+        cachedThreadPool,
+        () -> {
+          FirebaseAuth firebaseAuth = getAuth(arguments);
+          String host = (String) arguments.get(Constants.HOST);
+          int port = (int) arguments.get(Constants.PORT);
+          firebaseAuth.useEmulator(host, port);
           return null;
         });
   }
@@ -1191,6 +1207,9 @@ public class FlutterFirebaseAuthPlugin
         break;
       case "Auth#signOut":
         methodCallTask = signOut(call.arguments());
+        break;
+      case "Auth#useEmulator":
+        methodCallTask = useEmulator(call.arguments());
         break;
       case "Auth#verifyPasswordResetCode":
         methodCallTask = verifyPasswordResetCode(call.arguments());
