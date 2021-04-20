@@ -17,14 +17,16 @@ void main() {
         future: setupRemoteConfig(),
         builder: (BuildContext context, AsyncSnapshot<RemoteConfig> snapshot) {
           return snapshot.hasData
-              ? WelcomeWidget(remoteConfig: snapshot.data)
+              ? WelcomeWidget(remoteConfig: snapshot.requireData)
               : Container();
         },
       )));
 }
 
 class WelcomeWidget extends AnimatedWidget {
-  WelcomeWidget({this.remoteConfig}) : super(listenable: remoteConfig);
+  WelcomeWidget({
+    required this.remoteConfig,
+  }) : super(listenable: remoteConfig);
 
   final RemoteConfig remoteConfig;
 

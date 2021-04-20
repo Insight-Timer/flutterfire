@@ -1,13 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:e2e/e2e.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:integration_test/integration_test.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 void main() {
-  E2EWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('$RemoteConfig', () {
-    RemoteConfig remoteConfig;
+    late RemoteConfig remoteConfig;
 
     setUp(() async {
       await Firebase.initializeApp();
@@ -20,6 +21,7 @@ void main() {
         'welcome': 'default welcome',
         'hello': 'default hello',
       });
+      await remoteConfig.ensureInitialized();
     });
 
     testWidgets('fetch', (WidgetTester tester) async {
