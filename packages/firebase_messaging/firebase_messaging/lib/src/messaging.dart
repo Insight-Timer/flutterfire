@@ -14,15 +14,14 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   FirebaseMessagingPlatform? _delegatePackingProperty;
 
   FirebaseMessagingPlatform get _delegate {
-    return _delegatePackingProperty ??= FirebaseMessagingPlatform.instanceFor(
-        app: app, pluginConstants: pluginConstants);
+    return _delegatePackingProperty ??=
+        FirebaseMessagingPlatform.instanceFor(app: app, pluginConstants: pluginConstants);
   }
 
   /// The [FirebaseApp] for this current [FirebaseMessaging] instance.
   FirebaseApp app;
 
-  FirebaseMessaging._({required this.app})
-      : super(app.name, 'plugins.flutter.io/firebase_messaging');
+  FirebaseMessaging._({required this.app}) : super(app.name, 'plugins.flutter.io/firebase_messaging');
 
   /// Returns an instance using the default [FirebaseApp].
   static FirebaseMessaging get instance {
@@ -52,10 +51,8 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   //
   // static final Map<String, FirebaseMessaging> _cachedInstances = {};
 
-  static final _onMessageController =
-      StreamController<RemoteMessage>.broadcast(onListen: () {
-    Stream<RemoteMessage> onMessageStream =
-        FirebaseMessagingPlatform.onMessage.stream;
+  static final _onMessageController = StreamController<RemoteMessage>.broadcast(onListen: () {
+    Stream<RemoteMessage> onMessageStream = FirebaseMessagingPlatform.onMessage.stream;
 
     onMessageStream.pipe(_onMessageController);
   });
@@ -69,10 +66,8 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   /// see [onBackgroundMessage].
   static Stream<RemoteMessage> get onMessage => _onMessageController.stream;
 
-  static final _onMessageOpenedAppController =
-      StreamController<RemoteMessage>.broadcast(onListen: () {
-    Stream<RemoteMessage> onMessageOpenedAppStream =
-        FirebaseMessagingPlatform.onMessageOpenedApp.stream;
+  static final _onMessageOpenedAppController = StreamController<RemoteMessage>.broadcast(onListen: () {
+    Stream<RemoteMessage> onMessageOpenedAppStream = FirebaseMessagingPlatform.onMessageOpenedApp.stream;
 
     onMessageOpenedAppStream.pipe(_onMessageOpenedAppController);
   });
@@ -85,8 +80,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
   ///
   /// If your app is opened via a notification whilst the app is terminated,
   /// see [getInitialMessage].
-  static Stream<RemoteMessage> get onMessageOpenedApp =>
-      _onMessageOpenedAppController.stream;
+  static Stream<RemoteMessage> get onMessageOpenedApp => _onMessageOpenedAppController.stream;
 
   // ignore: use_setters_to_change_properties
   /// Set a message handler function which is called when the app is in the
@@ -297,7 +291,7 @@ class FirebaseMessaging extends FirebasePluginPlatform {
 
   /// suspend notification (android only)
   /// only handle braze notification for suspension
-  Future<void> suspendNotification({Map<String, String> messageFilters}) async {
+  Future<void> suspendNotification({required Map<String, String> messageFilters}) async {
     await _delegate.suspendNotification(messageFilters: messageFilters);
   }
 

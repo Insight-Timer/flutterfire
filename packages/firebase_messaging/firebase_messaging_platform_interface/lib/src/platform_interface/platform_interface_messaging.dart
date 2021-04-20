@@ -33,11 +33,8 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
 
   /// Create an instance with a [FirebaseApp] using an existing instance.
   factory FirebaseMessagingPlatform.instanceFor(
-      {required FirebaseApp app,
-      required Map<dynamic, dynamic> pluginConstants}) {
-    return FirebaseMessagingPlatform.instance
-        .delegateFor(app: app)
-        .setInitialValues(
+      {required FirebaseApp app, required Map<dynamic, dynamic> pluginConstants}) {
+    return FirebaseMessagingPlatform.instance.delegateFor(app: app).setInitialValues(
           isAutoInitEnabled: pluginConstants['AUTO_INIT_ENABLED'],
         );
   }
@@ -67,8 +64,7 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
   /// To handle messages whilst the app is in the background or terminated,
   /// see [onBackgroundMessage].
   static StreamController<RemoteMessage> get onMessage {
-    return _onMessageStreamController ??=
-        StreamController<RemoteMessage>.broadcast();
+    return _onMessageStreamController ??= StreamController<RemoteMessage>.broadcast();
   }
 
   // ignore: close_sinks
@@ -83,8 +79,7 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
   /// If your app is opened via a notification whilst the app is terminated,
   /// see [getInitialMessage].
   static StreamController<RemoteMessage> get onMessageOpenedApp {
-    return _onMessageOpenedAppStreamController ??=
-        StreamController<RemoteMessage>.broadcast();
+    return _onMessageOpenedAppStreamController ??= StreamController<RemoteMessage>.broadcast();
   }
 
   static BackgroundMessageHandler? _onBackgroundMessageHandler;
@@ -151,8 +146,7 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
   /// For example, on native platforms this could be to setup an isolate, whereas
   /// on web a service worker can be registered.
   void registerBackgroundMessageHandler(BackgroundMessageHandler handler) {
-    throw UnimplementedError(
-        'registerBackgroundMessageHandler() is not implemented');
+    throw UnimplementedError('registerBackgroundMessageHandler() is not implemented');
   }
 
   /// Removes access to an FCM token previously authorized with optional [senderId].
@@ -280,8 +274,7 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
     required bool badge,
     required bool sound,
   }) {
-    throw UnimplementedError(
-        'setForegroundNotificationPresentationOptions() is not implemented');
+    throw UnimplementedError('setForegroundNotificationPresentationOptions() is not implemented');
   }
 
   /// Send a new [RemoteMessage] to the FCM server.
@@ -310,7 +303,7 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
   }
 
   /// suspend notification
-  Future<void> suspendNotification({Map<String, String> messageFilters}) {
+  Future<void> suspendNotification({required Map<String, String> messageFilters}) {
     throw UnimplementedError('suspendNotification() is not implemented');
   }
 
