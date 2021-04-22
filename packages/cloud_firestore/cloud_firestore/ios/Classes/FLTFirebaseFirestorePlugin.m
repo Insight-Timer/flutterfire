@@ -522,7 +522,7 @@ FlutterStandardMethodCodec *_codec;
 }
 
 - (void)enableLogging:(id)arguments withMethodCallResult:(FLTFirebaseMethodCallResult *)result {
-  BOOL enable = arguments["enable"];
+  BOOL enable = arguments[@"enable"];
   [FIRFirestore enableLogging: enable];
   result.success(nil);
 }

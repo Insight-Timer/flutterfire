@@ -454,7 +454,8 @@ public class FlutterFirebaseFirestorePlugin
         break;
       case "Firestore#enableLogging":
         setEnableLogging(call.arguments());
-        break;
+        result.success(true);
+        return;
       default:
         result.notImplemented();
         return;
