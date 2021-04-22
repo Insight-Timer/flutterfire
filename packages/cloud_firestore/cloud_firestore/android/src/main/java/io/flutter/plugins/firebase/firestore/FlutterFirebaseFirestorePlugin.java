@@ -376,17 +376,6 @@ public class FlutterFirebaseFirestorePlugin
         });
   }
 
-   private Task<Void> enableLogging(Map<String, Object> arguments) {
-    return Tasks.call(
-        cachedThreadPool,
-        () -> {
-          FirebaseFirestore firestore =
-              (FirebaseFirestore) Objects.requireNonNull(arguments.get("enable"));
-          firestore.enable
-          return Tasks.await(firestore.waitForPendingWrites());
-        });
-  }
-
   @Override
   public void onMethodCall(MethodCall call, @NonNull final MethodChannel.Result result) {
     Task<?> methodCallTask;
