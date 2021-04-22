@@ -377,7 +377,7 @@ public class FlutterFirebaseFirestorePlugin
   }
 
   private void setEnableLogging(Map<String, Object> arguments) {
-     boolean enable = arguments.get("enable");
+     boolean enable = (boolean) Objects.requireNonNull(arguments.get("enable"));
      FirebaseFirestore.setLoggingEnabled(enable);
   }
 
