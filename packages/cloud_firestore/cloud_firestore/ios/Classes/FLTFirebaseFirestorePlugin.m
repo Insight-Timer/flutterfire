@@ -218,6 +218,9 @@ FlutterStandardMethodCodec *_codec;
   } else if ([@"DocumentReference#snapshots" isEqualToString:call.method]) {
     [self setupDocumentReferenceSnapshotsListener:call.arguments
                              withMethodCallResult:methodCallResult];
+  } else if ([@"Firestore#enableLogging" isEqualToString:call.method]) {
+    [self enableLogging:call.arguments
+                             withMethodCallResult:methodCallResult];
   } else {
     methodCallResult.success(FlutterMethodNotImplemented);
   }
@@ -516,6 +519,12 @@ FlutterStandardMethodCodec *_codec;
   [_streamHandlers setObject:handler forKey:identifier];
 
   return identifier;
+}
+
+- (void)enableLogging:(id)arguments withMethodCallResult:(FLTFirebaseMethodCallResult *)result {
+  BOOL enable = arguments["enable"];
+  [FIRFirestore enableLogging: enable];
+  result.success(nil);
 }
 
 @end

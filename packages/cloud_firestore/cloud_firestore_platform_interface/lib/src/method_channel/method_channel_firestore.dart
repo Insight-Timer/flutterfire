@@ -70,8 +70,7 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
   @override
   Future<void> clearPersistence() async {
     try {
-      await channel
-          .invokeMethod<void>('Firestore#clearPersistence', <String, dynamic>{
+      await channel.invokeMethod<void>('Firestore#clearPersistence', <String, dynamic>{
         'firestore': this,
       });
     } catch (e) {
@@ -80,8 +79,7 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
   }
 
   @override
-  Future<void> enablePersistence(
-      [PersistenceSettings? persistenceSettings]) async {
+  Future<void> enablePersistence([PersistenceSettings? persistenceSettings]) async {
     throw UnimplementedError(
         'enablePersistence() is only available for Web. Use [Settings.persistenceEnabled] for other platforms.');
   }
@@ -93,15 +91,13 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
 
   @override
   QueryPlatform collectionGroup(String collectionPath) {
-    return MethodChannelQuery(this, collectionPath,
-        isCollectionGroupQuery: true);
+    return MethodChannelQuery(this, collectionPath, isCollectionGroupQuery: true);
   }
 
   @override
   Future<void> disableNetwork() async {
     try {
-      await channel
-          .invokeMethod<void>('Firestore#disableNetwork', <String, dynamic>{
+      await channel.invokeMethod<void>('Firestore#disableNetwork', <String, dynamic>{
         'firestore': this,
       });
     } catch (e) {
@@ -117,8 +113,7 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
   @override
   Future<void> enableNetwork() async {
     try {
-      await channel
-          .invokeMethod<void>('Firestore#enableNetwork', <String, dynamic>{
+      await channel.invokeMethod<void>('Firestore#enableNetwork', <String, dynamic>{
         'firestore': this,
       });
     } catch (e) {
@@ -133,12 +128,9 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
 
     controller = StreamController<void>.broadcast(
       onListen: () async {
-        final observerId = await MethodChannelFirebaseFirestore.channel
-            .invokeMethod<String>('SnapshotsInSync#setup');
+        final observerId = await MethodChannelFirebaseFirestore.channel.invokeMethod<String>('SnapshotsInSync#setup');
 
-        snapshotStream =
-            MethodChannelFirebaseFirestore.snapshotsInSyncChannel(observerId!)
-                .receiveBroadcastStream(
+        snapshotStream = MethodChannelFirebaseFirestore.snapshotsInSyncChannel(observerId!).receiveBroadcastStream(
           <String, dynamic>{
             'firestore': this,
           },
@@ -161,11 +153,9 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
     TransactionHandler<T> transactionHandler, {
     Duration timeout = const Duration(seconds: 30),
   }) async {
-    assert(timeout.inMilliseconds > 0,
-        'Transaction timeout must be more than 0 milliseconds');
+    assert(timeout.inMilliseconds > 0, 'Transaction timeout must be more than 0 milliseconds');
 
-    final String? transactionId =
-        await MethodChannelFirebaseFirestore.channel.invokeMethod<String>(
+    final String? transactionId = await MethodChannelFirebaseFirestore.channel.invokeMethod<String>(
       'Transaction#create',
     );
 
@@ -199,8 +189,7 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
           return;
         }
 
-        final TransactionPlatform transaction =
-            MethodChannelTransaction(transactionId!, event['appName']);
+        final TransactionPlatform transaction = MethodChannelTransaction(transactionId!, event['appName']);
 
         // If the transaction fails on Dart side, then forward the error
         // right away and only inform native side of the error.
@@ -209,8 +198,7 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
         } catch (error, stack) {
           // Signal native that a user error occurred, and finish the
           // transaction
-          await MethodChannelFirebaseFirestore.channel
-              .invokeMethod('Transaction#storeResult', <String, dynamic>{
+          await MethodChannelFirebaseFirestore.channel.invokeMethod('Transaction#storeResult', <String, dynamic>{
             'transactionId': transactionId,
             'result': {
               'type': 'ERROR',
@@ -225,8 +213,7 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
         }
 
         // Send the transaction commands to Dart.
-        await MethodChannelFirebaseFirestore.channel
-            .invokeMethod('Transaction#storeResult', <String, dynamic>{
+        await MethodChannelFirebaseFirestore.channel.invokeMethod('Transaction#storeResult', <String, dynamic>{
           'transactionId': transactionId,
           'result': {
             'type': 'SUCCESS',
@@ -258,9 +245,19 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
   @override
   Future<void> waitForPendingWrites() async {
     try {
-      await channel.invokeMethod<void>(
-          'Firestore#waitForPendingWrites', <String, dynamic>{
+      await channel.invokeMethod<void>('Firestore#waitForPendingWrites', <String, dynamic>{
         'firestore': this,
+      });
+    } catch (e) {
+      throw convertPlatformException(e);
+    }
+  }
+
+  @override
+  Future<void> enableLogging(bool enable) async {
+    try {
+      await channel.invokeMethod<void>('Firestore#enableLogging', <String, dynamic>{
+        'enable': enable,
       });
     } catch (e) {
       throw convertPlatformException(e);

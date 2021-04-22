@@ -5,8 +5,7 @@
 import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart';
 import 'package:cloud_firestore_web/src/internals.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_core_web/firebase_core_web_interop.dart'
-    as core_interop;
+import 'package:firebase_core_web/firebase_core_web_interop.dart' as core_interop;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'src/collection_reference_web.dart';
@@ -31,15 +30,13 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
   /// Builds an instance of [FirebaseFirestoreWeb] with an optional [FirebaseApp] instance
   /// If [app] is null then the created instance will use the default [FirebaseApp]
   FirebaseFirestoreWeb({FirebaseApp? app})
-      : _webFirestore =
-            firestore_interop.getFirestoreInstance(core_interop.app(app?.name)),
+      : _webFirestore = firestore_interop.getFirestoreInstance(core_interop.app(app?.name)),
         super(appInstance: app) {
     FieldValueFactoryPlatform.instance = FieldValueFactoryWeb();
   }
 
   @override
-  FirebaseFirestorePlatform delegateFor(
-      {/*required*/ required FirebaseApp app}) {
+  FirebaseFirestorePlatform delegateFor({/*required*/ required FirebaseApp app}) {
     return FirebaseFirestoreWeb(app: app);
   }
 
@@ -58,9 +55,7 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
 
   @override
   QueryPlatform collectionGroup(String collectionPath) {
-    return QueryWeb(
-        this, collectionPath, _webFirestore.collectionGroup(collectionPath),
-        isCollectionGroupQuery: true);
+    return QueryWeb(this, collectionPath, _webFirestore.collectionGroup(collectionPath), isCollectionGroupQuery: true);
   }
 
   @override
@@ -69,8 +64,7 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
   }
 
   @override
-  DocumentReferencePlatform doc(String documentPath) =>
-      DocumentReferenceWeb(this, _webFirestore, documentPath);
+  DocumentReferencePlatform doc(String documentPath) => DocumentReferenceWeb(this, _webFirestore, documentPath);
 
   @override
   Future<void> enableNetwork() {
@@ -87,8 +81,7 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
       {Duration timeout = const Duration(seconds: 30)}) async {
     await guard(() {
       return _webFirestore.runTransaction((transaction) async {
-        return transactionHandler(
-            TransactionWeb(this, _webFirestore, transaction!));
+        return transactionHandler(TransactionWeb(this, _webFirestore, transaction!));
       }).timeout(timeout);
     });
     // Workaround for 'Runtime type information not available for type_variable_local'
@@ -111,13 +104,10 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
     }
 
     if (settings.host != null && settings.sslEnabled != null) {
-      _webFirestore.settings(firestore_interop.Settings(
-          cacheSizeBytes: cacheSizeBytes,
-          host: settings.host,
-          ssl: settings.sslEnabled));
+      _webFirestore.settings(
+          firestore_interop.Settings(cacheSizeBytes: cacheSizeBytes, host: settings.host, ssl: settings.sslEnabled));
     } else {
-      _webFirestore
-          .settings(firestore_interop.Settings(cacheSizeBytes: cacheSizeBytes));
+      _webFirestore.settings(firestore_interop.Settings(cacheSizeBytes: cacheSizeBytes));
     }
   }
 
@@ -135,5 +125,10 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
   @override
   Future<void> waitForPendingWrites() {
     return guard(_webFirestore.waitForPendingWrites);
+  }
+
+  @override
+  Future<void> enableLogging(bool enable) async {
+    return guard(() => _webFirestore.enableLogging(enable));
   }
 }

@@ -71,8 +71,7 @@ abstract class FirebaseFirestorePlatform extends PlatformInterface {
   }
 
   /// Enable persistence of Firestore data. Web only.
-  Future<void> enablePersistence(
-      [PersistenceSettings? persistenceSettings]) async {
+  Future<void> enablePersistence([PersistenceSettings? persistenceSettings]) async {
     throw UnimplementedError('enablePersistence() is not implemented');
   }
 
@@ -181,10 +180,13 @@ abstract class FirebaseFirestorePlatform extends PlatformInterface {
     throw UnimplementedError('waitForPendingWrites() is not implemented');
   }
 
+  Future<void> enableLogging(bool enable) {
+    throw UnimplementedError('enableLogging is not implemented');
+  }
+
   @override
   //ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) =>
-      other is FirebaseFirestorePlatform && other.app.name == app.name;
+  bool operator ==(Object other) => other is FirebaseFirestorePlatform && other.app.name == app.name;
 
   @override
   //ignore: avoid_equals_and_hash_code_on_mutable_classes

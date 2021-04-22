@@ -22,15 +22,13 @@ class FirebaseFirestore extends FirebasePluginPlatform {
   FirebaseFirestorePlatform? _delegatePackingProperty;
 
   FirebaseFirestorePlatform get _delegate {
-    return _delegatePackingProperty ??=
-        FirebaseFirestorePlatform.instanceFor(app: app);
+    return _delegatePackingProperty ??= FirebaseFirestorePlatform.instanceFor(app: app);
   }
 
   /// The [FirebaseApp] for this current [FirebaseFirestore] instance.
   FirebaseApp app;
 
-  FirebaseFirestore._({required this.app})
-      : super(app.name, 'plugins.flutter.io/firebase_firestore');
+  FirebaseFirestore._({required this.app}) : super(app.name, 'plugins.flutter.io/firebase_firestore');
 
   static final Map<String, FirebaseFirestore> _cachedInstances = {};
 
@@ -55,12 +53,9 @@ class FirebaseFirestore extends FirebasePluginPlatform {
 
   /// Gets a [CollectionReference] for the specified Firestore path.
   CollectionReference collection(String collectionPath) {
-    assert(collectionPath.isNotEmpty,
-        'a collectionPath path must be a non-empty string');
-    assert(!collectionPath.contains('//'),
-        'a collection path must not contain "//"');
-    assert(isValidCollectionPath(collectionPath),
-        'a collection path must point to a valid collection.');
+    assert(collectionPath.isNotEmpty, 'a collectionPath path must be a non-empty string');
+    assert(!collectionPath.contains('//'), 'a collection path must not contain "//"');
+    assert(isValidCollectionPath(collectionPath), 'a collection path must point to a valid collection.');
 
     return CollectionReference._(this, _delegate.collection(collectionPath));
   }
@@ -82,17 +77,14 @@ class FirebaseFirestore extends FirebasePluginPlatform {
   /// Enable persistence of Firestore data.
   ///
   /// This is a web-only method. Use [Settings.persistenceEnabled] for non-web platforms.
-  Future<void> enablePersistence(
-      [PersistenceSettings? persistenceSettings]) async {
+  Future<void> enablePersistence([PersistenceSettings? persistenceSettings]) async {
     return _delegate.enablePersistence(persistenceSettings);
   }
 
   /// Gets a [Query] for the specified collection group.
   Query collectionGroup(String collectionPath) {
-    assert(collectionPath.isNotEmpty,
-        'a collection path must be a non-empty string');
-    assert(!collectionPath.contains('/'),
-        'a collection path passed to collectionGroup() cannot contain "/"');
+    assert(collectionPath.isNotEmpty, 'a collection path must be a non-empty string');
+    assert(!collectionPath.contains('/'), 'a collection path passed to collectionGroup() cannot contain "/"');
 
     return Query._(this, _delegate.collectionGroup(collectionPath));
   }
@@ -108,12 +100,9 @@ class FirebaseFirestore extends FirebasePluginPlatform {
 
   /// Gets a [DocumentReference] for the specified Firestore path.
   DocumentReference doc(String documentPath) {
-    assert(
-        documentPath.isNotEmpty, 'a document path must be a non-empty string');
-    assert(!documentPath.contains('//'),
-        'a collection path must not contain "//"');
-    assert(isValidDocumentPath(documentPath),
-        'a document path must point to a valid document.');
+    assert(documentPath.isNotEmpty, 'a document path must be a non-empty string');
+    assert(!documentPath.contains('//'), 'a collection path must not contain "//"');
+    assert(isValidDocumentPath(documentPath), 'a document path must point to a valid document.');
 
     return DocumentReference._(this, _delegate.doc(documentPath));
   }
@@ -205,10 +194,13 @@ class FirebaseFirestore extends FirebasePluginPlatform {
     return _delegate.waitForPendingWrites();
   }
 
+  Future<void> enableLogging(bool enable) {
+    return _delegate.enableLogging(enable);
+  }
+
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) =>
-      other is FirebaseFirestore && other.app.name == app.name;
+  bool operator ==(Object other) => other is FirebaseFirestore && other.app.name == app.name;
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes

@@ -39,15 +39,13 @@ abstract class FirestoreJsImpl {
   external DocumentReferenceJsImpl doc(String documentPath);
 
 // ignore: prefer_void_to_null
-  external PromiseJsImpl<Null> enablePersistence(
-      [PersistenceSettings? settings]);
+  external PromiseJsImpl<Null> enablePersistence([PersistenceSettings? settings]);
 
   external void Function() onSnapshotsInSync(dynamic observer);
 // ignore: prefer_void_to_null
   external PromiseJsImpl<Null> clearPersistence();
 
-  external PromiseJsImpl<void> runTransaction(
-      Func1<TransactionJsImpl, PromiseJsImpl> updateFunction);
+  external PromiseJsImpl<void> runTransaction(Func1<TransactionJsImpl, PromiseJsImpl> updateFunction);
 
   external void settings(Settings settings);
 
@@ -62,6 +60,8 @@ abstract class FirestoreJsImpl {
 
 // ignore: prefer_void_to_null
   external PromiseJsImpl<Null> waitForPendingWrites();
+
+  external PromiseJsImpl<Null> setLogLevel(String logLevel);
 }
 
 @JS('WriteBatch')
@@ -71,12 +71,9 @@ abstract class WriteBatchJsImpl {
 
   external WriteBatchJsImpl delete(DocumentReferenceJsImpl documentRef);
 
-  external WriteBatchJsImpl set(
-      DocumentReferenceJsImpl documentRef, dynamic data,
-      [SetOptions? options]);
+  external WriteBatchJsImpl set(DocumentReferenceJsImpl documentRef, dynamic data, [SetOptions? options]);
 
-  external WriteBatchJsImpl update(
-      DocumentReferenceJsImpl documentRef, dynamic dataOrFieldsAndValues);
+  external WriteBatchJsImpl update(DocumentReferenceJsImpl documentRef, dynamic dataOrFieldsAndValues);
 }
 
 @JS('CollectionReference')
@@ -316,12 +313,9 @@ abstract class QueryJsImpl {
   external QueryJsImpl limitToLast(num? limit);
 
   external void Function() onSnapshot(
-      SnapshotListenOptions options,
-      void Function(QuerySnapshotJsImpl) onNext,
-      Func1<FirebaseError, dynamic> onError);
+      SnapshotListenOptions options, void Function(QuerySnapshotJsImpl) onNext, Func1<FirebaseError, dynamic> onError);
 
-  external QueryJsImpl orderBy(/*String|FieldPath*/ dynamic fieldPath,
-      [String? /*'desc'|'asc'*/ directionStr]);
+  external QueryJsImpl orderBy(/*String|FieldPath*/ dynamic fieldPath, [String? /*'desc'|'asc'*/ directionStr]);
 
   external QueryJsImpl startAfter(
       /*DocumentSnapshot|List<dynamic>*/
@@ -331,16 +325,17 @@ abstract class QueryJsImpl {
       /*DocumentSnapshot|List<dynamic>*/
       dynamic snapshotOrFieldValues);
 
-  external QueryJsImpl where(/*String|FieldPath*/ dynamic fieldPath,
-      String /*'<'|'<='|'=='|'>='|'>'*/ opStr, dynamic value);
+  external QueryJsImpl where(
+      /*String|FieldPath*/ dynamic fieldPath,
+      String /*'<'|'<='|'=='|'>='|'>'*/ opStr,
+      dynamic value);
 }
 
 @JS('QuerySnapshot')
 abstract class QuerySnapshotJsImpl {
   //ignore: todo
   // TODO: [SnapshotListenOptions] not currently used.
-  external List<DocumentChangeJsImpl> docChanges(
-      [SnapshotListenOptions? options]);
+  external List<DocumentChangeJsImpl> docChanges([SnapshotListenOptions? options]);
 
   external List<DocumentSnapshotJsImpl> get docs;
 
@@ -374,15 +369,11 @@ abstract class QuerySnapshotJsImpl {
 abstract class TransactionJsImpl {
   external TransactionJsImpl delete(DocumentReferenceJsImpl documentRef);
 
-  external PromiseJsImpl<DocumentSnapshotJsImpl> get(
-      DocumentReferenceJsImpl documentRef);
+  external PromiseJsImpl<DocumentSnapshotJsImpl> get(DocumentReferenceJsImpl documentRef);
 
-  external TransactionJsImpl set(
-      DocumentReferenceJsImpl documentRef, dynamic data,
-      [SetOptions? options]);
+  external TransactionJsImpl set(DocumentReferenceJsImpl documentRef, dynamic data, [SetOptions? options]);
 
-  external TransactionJsImpl update(
-      DocumentReferenceJsImpl documentRef, dynamic dataOrFieldsAndValues);
+  external TransactionJsImpl update(DocumentReferenceJsImpl documentRef, dynamic dataOrFieldsAndValues);
 }
 
 @JS('Timestamp')
