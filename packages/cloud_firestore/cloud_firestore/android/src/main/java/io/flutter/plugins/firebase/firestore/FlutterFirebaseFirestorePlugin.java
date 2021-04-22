@@ -448,7 +448,7 @@ public class FlutterFirebaseFirestorePlugin
         methodCallTask = waitForPendingWrites(call.arguments());
         break;
       case "Firestore#enableLogging":
-        boolean enable = call.arguments.get("enable");
+        boolean enable = call.arguments().get("enable");
         FirebaseFirestore.setLoggingEnabled(enable);
         break;
       default:
