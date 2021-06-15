@@ -1,3 +1,21 @@
+## 2.2.2
+
+ - Update a dependency to the latest release.
+
+## 2.2.1
+
+ - **TEST**: error handling for loadBundle() & namedQueryGet() (#6197).
+ - **TEST**: improve query assertions (#6249).
+ - **TEST**: update and assert documentId field & isNotEqualTo filter test (#6225).
+ - **DOCS**: Add Flutter Favorite badge (#6190).
+
+## 2.2.0
+
+ - **FEAT**: support for `loadBundle()` & `namedQueryGet()` (#6037).
+ - **FEAT**: upgrade Firebase JS SDK version to 8.6.1.
+ - **FIX**: podspec osx version checking script should use a version range instead of a single fixed version.
+ - **FIX**: pass GetOptions to web Query.get (#6132).
+
 ## 2.1.0
 
  - **FIX**: Fix FirebaseOptions hashCode (#3263).
