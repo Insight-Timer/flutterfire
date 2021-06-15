@@ -2,10 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:typed_data';
+
 import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart';
 import 'package:cloud_firestore_web/src/internals.dart';
+import 'package:cloud_firestore_web/src/load_bundle_task_web.dart';
+import 'package:cloud_firestore_web/src/utils/web_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_core_web/firebase_core_web_interop.dart' as core_interop;
+import 'package:firebase_core_web/firebase_core_web_interop.dart'
+    as core_interop;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'src/collection_reference_web.dart';
@@ -128,7 +133,19 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
   }
 
   @override
-  Future<void> enableLogging(bool enable) async {
-    return guard(() => _webFirestore.enableLogging(enable));
+  LoadBundleTaskPlatform loadBundle(Uint8List bundle) {
+    return LoadBundleTaskWeb(_webFirestore.loadBundle(bundle));
+  }
+
+  @override
+  Future<QuerySnapshotPlatform> namedQueryGet(
+    String name, {
+    GetOptions options = const GetOptions(),
+  }) async {
+    firestore_interop.Query? query = await _webFirestore.namedQuery(name);
+    firestore_interop.QuerySnapshot snapshot =
+        await query.get(convertGetOptions(options));
+
+    return convertWebQuerySnapshot(this, snapshot);
   }
 }

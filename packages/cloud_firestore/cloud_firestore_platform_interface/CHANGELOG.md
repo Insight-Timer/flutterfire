@@ -1,3 +1,15 @@
+## 5.1.2
+
+ - Update a dependency to the latest release.
+
+## 5.1.1
+
+ - Update a dependency to the latest release.
+
+## 5.1.0
+
+ - **FEAT**: loadBundle() & namedQueryGet() implementation (#6037).
+
 ## 5.0.1
 
  - **DOCS**: Add missing homepage/repository links (#6054).

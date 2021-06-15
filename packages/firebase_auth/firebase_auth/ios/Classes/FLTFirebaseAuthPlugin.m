@@ -839,13 +839,23 @@ NSString *const kErrMsgInvalidCredential =
   NSDictionary *profileUpdates = arguments[@"profile"];
   FIRUserProfileChangeRequest *changeRequest = [currentUser profileChangeRequest];
 
-  if (profileUpdates[@"displayName"] != nil &&
-      ![profileUpdates[@"displayName"] isEqual:[NSNull null]]) {
-    changeRequest.displayName = profileUpdates[@"displayName"];
+  if (profileUpdates[@"displayName"] != nil) {
+    if ([profileUpdates[@"displayName"] isEqual:[NSNull null]]) {
+      changeRequest.displayName = nil;
+    } else {
+      changeRequest.displayName = profileUpdates[@"displayName"];
+    }
   }
 
-  if (profileUpdates[@"photoURL"] != nil && ![profileUpdates[@"photoURL"] isEqual:[NSNull null]]) {
-    changeRequest.photoURL = [NSURL URLWithString:profileUpdates[@"photoURL"]];
+  if (profileUpdates[@"photoURL"] != nil) {
+    if ([profileUpdates[@"photoURL"] isEqual:[NSNull null]]) {
+      // We apparently cannot set photoURL to nil/NULL to remove it.
+      // Instead, setting it to empty string appears to work.
+      // When doing so, Dart will properly receive `null` anyway.
+      changeRequest.photoURL = [NSURL URLWithString:@""];
+    } else {
+      changeRequest.photoURL = [NSURL URLWithString:profileUpdates[@"photoURL"]];
+    }
   }
 
   [changeRequest commitChangesWithCompletion:^(NSError *error) {
@@ -1028,8 +1038,15 @@ NSString *const kErrMsgInvalidCredential =
 
 - (FIRAuth *_Nullable)getFIRAuthFromArguments:(NSDictionary *)arguments {
   NSString *appNameDart = arguments[@"appName"];
+  NSString *tenantId = arguments[@"tenantId"];
   FIRApp *app = [FLTFirebasePlugin firebaseAppNamed:appNameDart];
-  return [FIRAuth authWithApp:app];
+  FIRAuth *auth = [FIRAuth authWithApp:app];
+
+  if (tenantId != nil && ![tenantId isEqual:[NSNull null]]) {
+    auth.tenantID = tenantId;
+  }
+
+  return auth;
 }
 
 - (FIRActionCodeSettings *_Nullable)getFIRActionCodeSettingsFromArguments:
@@ -1251,7 +1268,14 @@ NSString *const kErrMsgInvalidCredential =
   userData[@"isAnonymous"] = @(user.isAnonymous);
   userData[@"emailVerified"] = @(user.isEmailVerified);
 
-  userData[@"refreshToken"] = user.refreshToken;
+  if (user.tenantID != nil) {
+    userData[@"tenantId"] = user.tenantID;
+  } else {
+    userData[@"tenantId"] = [NSNull null];
+  }
+
+  // native does not provide refresh tokens
+  userData[@"refreshToken"] = @"";
   return userData;
 }
 

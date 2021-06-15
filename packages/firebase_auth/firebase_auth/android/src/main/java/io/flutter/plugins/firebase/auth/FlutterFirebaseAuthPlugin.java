@@ -150,7 +150,12 @@ public class FlutterFirebaseAuthPlugin
   static FirebaseAuth getAuth(Map<String, Object> arguments) {
     String appName = (String) Objects.requireNonNull(arguments.get(Constants.APP_NAME));
     FirebaseApp app = FirebaseApp.getInstance(appName);
-    return FirebaseAuth.getInstance(app);
+    FirebaseAuth auth = FirebaseAuth.getInstance(app);
+    String tenantId = (String) arguments.get(Constants.TENANT_ID);
+    if (tenantId != null) {
+      auth.setTenantId(tenantId);
+    }
+    return auth;
   }
 
   private FirebaseUser getCurrentUser(Map<String, Object> arguments) {
@@ -337,6 +342,7 @@ public class FlutterFirebaseAuthPlugin
     output.put(Constants.PROVIDER_DATA, parseUserInfoList(firebaseUser.getProviderData()));
     output.put(Constants.REFRESH_TOKEN, ""); // native does not provide refresh tokens
     output.put(Constants.UID, firebaseUser.getUid());
+    output.put(Constants.TENANT_ID, firebaseUser.getTenantId());
 
     return output;
   }
@@ -944,12 +950,18 @@ public class FlutterFirebaseAuthPlugin
               (Map<String, String>) Objects.requireNonNull(arguments.get(Constants.PROFILE));
           UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
 
-          if (profile.get(Constants.DISPLAY_NAME) != null) {
-            builder.setDisplayName(profile.get(Constants.DISPLAY_NAME));
+          if (profile.containsKey(Constants.DISPLAY_NAME)) {
+            String displayName = profile.get(Constants.DISPLAY_NAME);
+            builder.setDisplayName(displayName);
           }
 
-          if (profile.get(Constants.PHOTO_URL) != null) {
-            builder.setPhotoUri(Uri.parse(profile.get(Constants.PHOTO_URL)));
+          if (profile.containsKey(Constants.PHOTO_URL)) {
+            String photoURL = profile.get(Constants.PHOTO_URL);
+            if (photoURL != null) {
+              builder.setPhotoUri(Uri.parse(photoURL));
+            } else {
+              builder.setPhotoUri(null);
+            }
           }
 
           Tasks.await(firebaseUser.updateProfile(builder.build()));

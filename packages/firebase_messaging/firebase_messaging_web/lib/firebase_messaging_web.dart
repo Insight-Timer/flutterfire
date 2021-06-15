@@ -49,6 +49,12 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
     _initialized = true;
   }
 
+  /// Updates user on browser support for Firebase.Messaging
+  @override
+  bool isSupported() {
+    return messaging_interop.isSupported();
+  }
+
   @override
   void registerBackgroundMessageHandler(BackgroundMessageHandler handler) {}
 
@@ -76,7 +82,7 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
   }
 
   @override
-  Future<void> deleteToken({String? senderId}) async {
+  Future<void> deleteToken() async {
     if (!_initialized) {
       // no-op for unsupported browsers
       return;
@@ -91,7 +97,7 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
   }
 
   @override
-  Future<String?> getToken({String? senderId, String? vapidKey}) async {
+  Future<String?> getToken({String? vapidKey}) async {
     if (!_initialized) {
       // no-op for unsupported browsers
       return null;

@@ -1,3 +1,16 @@
+## 2.1.2
+
+ - Update a dependency to the latest release.
+
+## 2.1.1
+
+ - Update a dependency to the latest release.
+
+## 2.1.0
+
+ - **FIX**: pass GetOptions to web Query.get (#6132).
+ - **FEAT**: loadBundle() & namedQueryGet() implementation (#6037).
+
 ## 2.0.1
 
  - **DOCS**: Add missing homepage/repository links (#6054).
