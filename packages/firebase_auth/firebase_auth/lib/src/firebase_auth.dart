@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -80,6 +81,10 @@ class FirebaseAuth extends FirebasePluginPlatform {
   ///
   /// Note: auth emulator is not supported for web yet. firebase-js-sdk does not support
   /// auth.useEmulator until v8.2.4, but FlutterFire does not support firebase-js-sdk v8+ yet
+  @Deprecated(
+    'Will be removed in future release. '
+    'Use useAuthEmulator().',
+  )
   Future<void> useEmulator(String origin) async {
     assert(origin.isNotEmpty);
     String mappedOrigin = origin;
@@ -104,7 +109,29 @@ class FirebaseAuth extends FirebasePluginPlatform {
     // Two non-empty groups in RegExp match - which is null-tested - these are non-null now
     final String host = match.group(1)!;
     final int port = int.parse(match.group(2)!);
-    await _delegate.useEmulator(host, port);
+
+    await useAuthEmulator(host, port);
+  }
+
+  /// Changes this instance to point to an Auth emulator running locally.
+  ///
+  /// Set the [host] of the local emulator, such as "localhost"
+  /// Set the [port] of the local emulator, such as "9099" (port 9099 is default for auth package)
+  ///
+  /// Note: Must be called immediately, prior to accessing auth methods.
+  /// Do not use with production credentials as emulator traffic is not encrypted.
+  Future<void> useAuthEmulator(String host, int port) async {
+    String mappedHost = host;
+
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      if (mappedHost == 'localhost' || mappedHost == '127.0.0.1') {
+        // ignore: avoid_print
+        print('Mapping Auth Emulator host "$mappedHost" to "10.0.2.2".');
+        mappedHost = '10.0.2.2';
+      }
+    }
+
+    await _delegate.useAuthEmulator(mappedHost, port);
   }
 
   /// The current Auth instance's tenant ID.
@@ -341,7 +368,7 @@ class FirebaseAuth extends FirebasePluginPlatform {
   /// On web platforms, if `null` is provided as the [languageCode] the Firebase
   /// project default language will be used. On native platforms, the device
   /// language will be used.
-  Future<void> setLanguageCode(String languageCode) {
+  Future<void> setLanguageCode(String? languageCode) {
     return _delegate.setLanguageCode(languageCode);
   }
 
@@ -552,7 +579,7 @@ class FirebaseAuth extends FirebasePluginPlatform {
   /// Starts a sign-in flow for a phone number.
   ///
   /// You can optionally provide a [RecaptchaVerifier] instance to control the
-  /// reCAPTCHA widget apperance and behaviour.
+  /// reCAPTCHA widget apperance and behavior.
   ///
   /// Once the reCAPTCHA verification has completed, called [ConfirmationResult.confirm]
   /// with the users SMS verification code to complete the authentication flow.

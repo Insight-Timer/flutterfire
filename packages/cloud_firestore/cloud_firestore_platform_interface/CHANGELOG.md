@@ -1,3 +1,56 @@
+## 5.4.10
+
+ - **REFACTOR**: fix all `unnecessary_import` analyzer issues introduced with Flutter 2.8. ([7f0e82c9](https://github.com/FirebaseExtended/flutterfire/commit/7f0e82c978a3f5a707dd95c7e9136a3e106ff75e))
+
+## 5.4.9
+
+ - Update a dependency to the latest release.
+
+## 5.4.8
+
+ - Update a dependency to the latest release.
+
+## 5.4.7
+
+ - Update a dependency to the latest release.
+
+## 5.4.6
+
+ - Update a dependency to the latest release.
+
+## 5.4.5
+
+ - Update a dependency to the latest release.
+
+## 5.4.4
+
+ - Update a dependency to the latest release.
+
+## 5.4.3
+
+ - Update a dependency to the latest release.
+
+## 5.4.2
+
+ - Update a dependency to the latest release.
+
+## 5.4.1
+
+ - Update a dependency to the latest release.
+
+## 5.4.0
+
+ - **STYLE**: enable additional lint rules (#6832).
+ - **FEAT**: override ==/hashCode for Firestore Queries (#6797).
+
+## 5.3.0
+
+ - **FEAT**: useFirestoreEmulator(host, port) API for firestore (#6428).
+
+## 5.2.0
+
+ - **FEAT**: useFirestoreEmulator(host, port) API for firestore (#6428).
+
 ## 5.1.2
 
  - Update a dependency to the latest release.

@@ -1,10 +1,10 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -75,6 +75,7 @@ void main() {
             'exception': exception,
             'reason': exceptionReason,
             'information': '',
+            'fatal': false,
             'stackTraceElements': getStackTraceElements(stack)
           })
         ]);
@@ -122,15 +123,26 @@ void main() {
         ],
         context: ErrorDescription(exceptionReason),
       );
-      await crashlytics!.recordFlutterError(details);
-      expect(methodCallLog, <Matcher>[
-        isMethodCall('Crashlytics#recordError', arguments: {
-          'exception': exception,
-          'reason': exceptionReason,
-          'information': '$exceptionFirstMessage\n$exceptionSecondMessage',
-          'stackTraceElements': getStackTraceElements(stack)
-        })
-      ]);
+      final oldPresentError = FlutterError.presentError;
+      var presentedError = false;
+      FlutterError.presentError = (details) {
+        presentedError = true;
+      };
+      try {
+        await crashlytics!.recordFlutterError(details);
+        expect(presentedError, true);
+        expect(methodCallLog, <Matcher>[
+          isMethodCall('Crashlytics#recordError', arguments: {
+            'exception': exception,
+            'reason': exceptionReason,
+            'fatal': false,
+            'information': '$exceptionFirstMessage\n$exceptionSecondMessage',
+            'stackTraceElements': getStackTraceElements(stack)
+          })
+        ]);
+      } finally {
+        FlutterError.presentError = oldPresentError;
+      }
     });
 
     group('log', () {

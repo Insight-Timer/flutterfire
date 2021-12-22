@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -73,7 +74,8 @@ class Storage extends JsObjectWrapper<storage_interop.StorageJsImpl> {
   ///
   /// Note: must be called before using storage methods, do not use
   /// with production credentials as local connections are unencrypted
-  void useEmulator(String host, int port) => jsObject.useEmulator(host, port);
+  void useStorageEmulator(String host, int port) =>
+      jsObject.useEmulator(host, port);
 }
 
 /// StorageReference is a reference to a Google Cloud Storage object.

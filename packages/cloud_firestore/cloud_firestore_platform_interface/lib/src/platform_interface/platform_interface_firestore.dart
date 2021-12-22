@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2017, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -5,13 +6,21 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:cloud_firestore_platform_interface/cloud_firestore_platform_interface.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import '../get_options.dart';
 import '../persistence_settings.dart';
 import '../method_channel/method_channel_firestore.dart';
+import '../settings.dart';
+import 'platform_interface_collection_reference.dart';
+import 'platform_interface_document_reference.dart';
+import 'platform_interface_load_bundle_task.dart';
+import 'platform_interface_query.dart';
+import 'platform_interface_query_snapshot.dart';
+import 'platform_interface_transaction.dart';
+import 'platform_interface_write_batch.dart';
 
 /// Defines an interface to work with Cloud Firestore on web and mobile
 abstract class FirebaseFirestorePlatform extends PlatformInterface {
@@ -20,7 +29,7 @@ abstract class FirebaseFirestorePlatform extends PlatformInterface {
   final FirebaseApp? appInstance;
 
   /// Create an instance using [app]
-  FirebaseFirestorePlatform({this.appInstance /*?*/}) : super(token: _token);
+  FirebaseFirestorePlatform({this.appInstance}) : super(token: _token);
 
   /// Returns the [FirebaseApp] for the current instance.
   FirebaseApp get app {
@@ -55,6 +64,12 @@ abstract class FirebaseFirestorePlatform extends PlatformInterface {
   @protected
   FirebaseFirestorePlatform delegateFor({required FirebaseApp app}) {
     throw UnimplementedError('delegateFor() is not implemented');
+  }
+
+  /// useEmulator is used for web only. Native platforms use Firestore settings
+  /// to initialize emulator.
+  void useEmulator(String host, int port) {
+    throw UnimplementedError('useEmulator() is not implemented');
   }
 
   /// Creates a write batch, used for performing multiple writes as a single

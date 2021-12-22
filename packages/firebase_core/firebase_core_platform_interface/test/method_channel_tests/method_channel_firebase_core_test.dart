@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -62,13 +63,6 @@ void main() {
     });
 
     group('.initializeApp()', () {
-      test('should throw if trying to initialize default app', () async {
-        await expectLater(
-          () => channelPlatform.initializeApp(name: defaultFirebaseAppName),
-          throwsA(noDefaultAppInitialization()),
-        );
-      });
-
       test('should initialize core if not first initialized', () async {
         await channelPlatform.initializeApp();
 

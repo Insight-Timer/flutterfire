@@ -1,10 +1,10 @@
-group 'io.flutter.plugins.firebaseanalytics'
+group 'io.flutter.plugins.firebase.analytics'
 version '1.0-SNAPSHOT'
 
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -15,7 +15,7 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -38,7 +38,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 19
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
@@ -50,32 +50,11 @@ android {
         implementation 'com.google.firebase:firebase-analytics'
         implementation 'androidx.annotation:annotation:1.1.0'
     }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
 }
 
-// TODO(kroikie): Remove this hack once androidx.lifecycle is included on stable. https://github.com/flutter/flutter/issues/42348
-afterEvaluate {
-    def containsEmbeddingDependencies = false
-    for (def configuration : configurations.all) {
-        for (def dependency : configuration.dependencies) {
-            if (dependency.group == 'io.flutter' &&
-                    dependency.name.startsWith('flutter_embedding') &&
-                    dependency.isTransitive())
-            {
-                containsEmbeddingDependencies = true
-                break
-            }
-        }
-    }
-    if (!containsEmbeddingDependencies) {
-        android {
-            dependencies {
-                def lifecycle_version = "1.1.1"
-                compileOnly "android.arch.lifecycle:runtime:$lifecycle_version"
-                compileOnly "android.arch.lifecycle:common:$lifecycle_version"
-                compileOnly "android.arch.lifecycle:common-java8:$lifecycle_version"
-            }
-        }
-    }
-}
 
 apply from: file("./user-agent.gradle")

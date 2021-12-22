@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -184,12 +185,12 @@ void main() {
     });
 
     group('emulator', () {
-      test('useEmulator() should call delegate method', () async {
+      test('useAuthEmulator() should call delegate method', () async {
         // Necessary as we otherwise get a "null is not a Future<void>" error
-        when(mockAuthPlatform.useEmulator(kMockHost, kMockPort))
+        when(mockAuthPlatform.useAuthEmulator(kMockHost, kMockPort))
             .thenAnswer((i) async {});
-        await auth.useEmulator('http://$kMockHost:$kMockPort');
-        verify(mockAuthPlatform.useEmulator(kMockHost, kMockPort));
+        await auth.useAuthEmulator(kMockHost, kMockPort);
+        verify(mockAuthPlatform.useAuthEmulator(kMockHost, kMockPort));
       });
     });
 
@@ -867,7 +868,7 @@ class MockFirebaseAuth extends Mock
   }
 
   @override
-  Future<void> useEmulator(String host, int port) {
+  Future<void> useAuthEmulator(String host, int port) {
     return super.noSuchMethod(
       Invocation.method(#useEmulator, [host, port]),
       returnValue: neverEndingFuture<void>(),

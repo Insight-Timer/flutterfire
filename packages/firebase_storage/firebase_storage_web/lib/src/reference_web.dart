@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2017, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -27,9 +28,9 @@ class ReferenceWeb extends ReferencePlatform {
       : _path = path,
         super(storage, path) {
     if (_path.startsWith(_storageUrlPrefix)) {
-      _ref = storage.webStorage!.refFromURL(_path);
+      _ref = storage.delegate.refFromURL(_path);
     } else {
-      _ref = storage.webStorage!.ref(_path);
+      _ref = storage.delegate.ref(_path);
     }
   }
 

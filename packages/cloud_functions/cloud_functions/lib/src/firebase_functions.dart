@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2019, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -67,23 +68,19 @@ class FirebaseFunctions extends FirebasePluginPlatform {
 
   /// Changes this instance to point to a Cloud Functions emulator running locally.
   ///
-  /// Set the [origin] of the local emulator, such as "http://localhost:5001", or `null`
-  /// to remove.
-  void useFunctionsEmulator({required String origin}) {
-    assert(origin.isNotEmpty);
-
+  /// Set the [host] of the local emulator, such as "localhost"
+  /// Set the [port] of the local emulator, such as "5001" (port 5001 is default for functions package)
+  void useFunctionsEmulator(String host, int port) {
+    String mappedHost = host;
     // Android considers localhost as 10.0.2.2 - automatically handle this for users.
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      if (origin.startsWith('http://localhost')) {
-        _origin = origin.replaceFirst('http://localhost', 'http://10.0.2.2');
-        return;
-      }
-      if (origin.startsWith('http://127.0.0.1')) {
-        _origin = origin.replaceFirst('http://127.0.0.1', 'http://10.0.2.2');
-        return;
+      if (mappedHost == 'localhost' || mappedHost == '127.0.0.1') {
+        // ignore: avoid_print
+        print('Mapping Functions Emulator host "$mappedHost" to "10.0.2.2".');
+        mappedHost = '10.0.2.2';
       }
     }
 
-    _origin = origin;
+    _origin = 'http://$mappedHost:$port';
   }
 }

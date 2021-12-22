@@ -1,5 +1,3 @@
-// @dart = 2.9
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,12 +6,23 @@ import 'test_utils.dart';
 
 void runInstanceTests() {
   group('$FirebaseStorage', () {
-    /*late*/ FirebaseStorage storage;
-    /*late*/ FirebaseApp secondaryApp;
-    /*late*/ FirebaseApp secondaryAppWithoutBucket;
+    late FirebaseStorage storage;
+    late FirebaseApp secondaryApp;
+    late FirebaseApp secondaryAppWithoutBucket;
 
     setUpAll(() async {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: 'AIzaSyAgUhHU8wSJgO5MVNy95tMT07NEjzMOfz0',
+          authDomain: 'react-native-firebase-testing.firebaseapp.com',
+          databaseURL: 'https://react-native-firebase-testing.firebaseio.com',
+          projectId: 'react-native-firebase-testing',
+          storageBucket: 'react-native-firebase-testing.appspot.com',
+          messagingSenderId: '448618578101',
+          appId: '1:448618578101:web:772d484dc9eb15e9ac3efc',
+          measurementId: 'G-0N1G9FLDZE',
+        ),
+      );
       storage = FirebaseStorage.instance;
       secondaryApp = await testInitializeSecondaryApp();
     });
@@ -72,6 +81,16 @@ void runInstanceTests() {
         expect(ref.bucket, 'foo');
       });
 
+      test('accepts a https url from google cloud', () async {
+        const url =
+            'https://storage.googleapis.com/react-native-firebase-testing.appspot.com/pdf/4lqA70lYwfRgH1krOevw6mLMgPs2_162613790513241';
+        Reference ref = storage.refFromURL(url);
+        expect(ref.bucket, 'react-native-firebase-testing.appspot.com');
+        expect(ref.name, '4lqA70lYwfRgH1krOevw6mLMgPs2_162613790513241');
+        expect(
+            ref.fullPath, 'pdf/4lqA70lYwfRgH1krOevw6mLMgPs2_162613790513241');
+      });
+
       test('accepts a https url', () async {
         const url =
             'https://firebasestorage.googleapis.com/v0/b/react-native-firebase-testing.appspot.com/o/1mbTestFile.gif?alt=media';
@@ -79,6 +98,15 @@ void runInstanceTests() {
         expect(ref.bucket, 'react-native-firebase-testing.appspot.com');
         expect(ref.name, '1mbTestFile.gif');
         expect(ref.fullPath, '1mbTestFile.gif');
+      });
+
+      test('accepts a https url with a deep path', () async {
+        const url =
+            'https://firebasestorage.googleapis.com/v0/b/react-native-firebase-testing.appspot.com/o/nested/path/segments/1mbTestFile.gif?alt=media';
+        Reference ref = storage.refFromURL(url);
+        expect(ref.bucket, 'react-native-firebase-testing.appspot.com');
+        expect(ref.name, '1mbTestFile.gif');
+        expect(ref.fullPath, 'nested/path/segments/1mbTestFile.gif');
       });
 
       test('accepts a https url with special characters', () async {
@@ -99,17 +127,47 @@ void runInstanceTests() {
         expect(ref.fullPath, '1mbTestFile.gif');
       });
 
+      test('accepts a Storage emulator url', () {
+        const url =
+            'http://localhost:9199/v0/b/react-native-firebase-testing.appspot.com/o/1mbTestFile.gif?alt=media';
+        Reference ref = storage.refFromURL(url);
+        expect(ref.bucket, 'react-native-firebase-testing.appspot.com');
+        expect(ref.name, '1mbTestFile.gif');
+        expect(ref.fullPath, '1mbTestFile.gif');
+      });
+
+      test('accepts a https url including port number', () {
+        const url =
+            'https://firebasestorage.googleapis.com:433/v0/b/react-native-firebase-testing.appspot.com/o/nested/path/segments/1mbTestFile.gif?alt=media';
+        Reference ref = storage.refFromURL(url);
+        expect(ref.bucket, 'react-native-firebase-testing.appspot.com');
+        expect(ref.name, '1mbTestFile.gif');
+        expect(ref.fullPath, 'nested/path/segments/1mbTestFile.gif');
+
+        const googleUrl =
+            'https://storage.googleapis.com/react-native-firebase-testing.appspot.com/pdf/4lqA70lYwfRgH1krOevw6mLMgPs2_162613790513241';
+        Reference refGoogle = storage.refFromURL(googleUrl);
+        expect(refGoogle.bucket, 'react-native-firebase-testing.appspot.com');
+        expect(refGoogle.name, '4lqA70lYwfRgH1krOevw6mLMgPs2_162613790513241');
+        expect(refGoogle.fullPath,
+            'pdf/4lqA70lYwfRgH1krOevw6mLMgPs2_162613790513241');
+      });
+
       test('throws an error if https url could not be parsed', () async {
-        try {
-          storage.refFromURL('https://invertase.io');
-          fail('Did not throw an Error.');
-        } catch (error) {
-          expect(
-              error.message,
+        expect(
+          () {
+            storage.refFromURL('https://invertase.io');
+            fail('Did not throw an Error.');
+          },
+          throwsA(
+            isA<AssertionError>().having(
+              (p0) => p0.message,
+              'assertion message',
               contains(
-                  "url could not be parsed, ensure it's a valid storage url"));
-          return;
-        }
+                  "url could not be parsed, ensure it's a valid storage url"),
+            ),
+          ),
+        );
       });
 
       test('accepts a gs url without a fullPath', () async {
@@ -121,23 +179,33 @@ void runInstanceTests() {
 
       test('throws an error if url does not start with gs:// or https://',
           () async {
-        try {
-          storage.refFromURL('bs://foo/bar/cat.gif');
-          fail('Should have thrown an [AssertionError]');
-        } catch (error) {
-          expect(error.message,
-              contains("a url must start with 'gs://' or 'https://'"));
-        }
+        expect(
+          () {
+            storage.refFromURL('bs://foo/bar/cat.gif');
+            fail('Should have thrown an [AssertionError]');
+          },
+          throwsA(
+            isA<AssertionError>().having(
+              (p0) => p0.message,
+              'assertion message',
+              contains("a url must start with 'gs://' or 'https://'"),
+            ),
+          ),
+        );
       });
     });
 
     group('setMaxOperationRetryTime', () {
       test('should set', () async {
-        expect(storage.maxOperationRetryTime,
-            const Duration(milliseconds: 120000));
+        expect(
+          storage.maxOperationRetryTime,
+          const Duration(milliseconds: 120000),
+        );
         storage.setMaxOperationRetryTime(const Duration(milliseconds: 100000));
-        expect(storage.maxOperationRetryTime,
-            const Duration(milliseconds: 100000));
+        expect(
+          storage.maxOperationRetryTime,
+          const Duration(milliseconds: 100000),
+        );
       });
     });
 
