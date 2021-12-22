@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -50,6 +51,8 @@ abstract class FirestoreJsImpl {
   external PromiseJsImpl<void> runTransaction(Func1<TransactionJsImpl, PromiseJsImpl> updateFunction);
 
   external void settings(Settings settings);
+
+  external void useEmulator(String host, int port);
 
 // ignore: prefer_void_to_null
   external PromiseJsImpl<Null> disableNetwork();
@@ -142,20 +145,20 @@ class FieldPath {
 }
 
 @JS('GeoPoint')
-external GeoPoint get GeoPointConstructor;
+external GeoPointJsImpl get GeoPointConstructor;
 
 /// An immutable object representing a geo point in Cloud Firestore.
 /// The geo point is represented as latitude/longitude pair.
 ///
 /// See: <https://firebase.google.com/docs/reference/js/firebase.firestore.GeoPoint>.
-@JS()
-class GeoPoint {
+@JS('GeoPoint')
+class GeoPointJsImpl {
   /// Creates a new immutable [GeoPoint] object with the provided [latitude] and
   /// [longitude] values.
   ///
   /// [latitude] values are in the range of -90 to 90.
   /// [longitude] values are in the range of -180 to 180.
-  external factory GeoPoint(num latitude, num longitude);
+  external factory GeoPointJsImpl(num latitude, num longitude);
 
   /// The latitude of this GeoPoint instance.
   external num get latitude;
@@ -168,14 +171,14 @@ class GeoPoint {
 }
 
 @JS('Blob')
-external Blob get BlobConstructor;
+external BlobJsImpl get BlobConstructor;
 
 @JS('Blob')
 @anonymous
-abstract class Blob {
-  external static Blob fromBase64String(String base64);
+abstract class BlobJsImpl {
+  external static BlobJsImpl fromBase64String(String base64);
 
-  external static Blob fromUint8Array(Uint8List list);
+  external static BlobJsImpl fromUint8Array(Uint8List list);
 
   external String toBase64();
 

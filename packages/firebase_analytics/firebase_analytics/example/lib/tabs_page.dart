@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class TabsPage extends StatefulWidget {
-  const TabsPage(this.observer, {Key? key}) : super(key: key);
+  TabsPage(this.observer, {Key? key}) : super(key: key);
 
   final FirebaseAnalyticsObserver observer;
 
@@ -21,6 +21,8 @@ class _TabsPageState extends State<TabsPage>
         SingleTickerProviderStateMixin,
         // ignore: prefer_mixin
         RouteAware {
+  final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
   late final TabController _controller = TabController(
     vsync: this,
     length: tabs.length,
@@ -87,7 +89,7 @@ class _TabsPageState extends State<TabsPage>
   }
 
   void _sendCurrentTabToAnalytics() {
-    widget.observer.analytics.setCurrentScreen(
+    analytics.setCurrentScreen(
       screenName: '${TabsPage.routeName}/tab$selectedIndex',
     );
   }

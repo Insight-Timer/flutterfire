@@ -3,8 +3,22 @@
 // found in the LICENSE file.
 
 #import "FLTFirebaseCrashlyticsPlugin.h"
+#import "Crashlytics_Platform.h"
 
 #import <Firebase/Firebase.h>
+
+#if TARGET_OS_OSX
+// macOS platform does not support analytics
+#else
+#if __has_include(<FirebaseCrashlytics/FIRAnalyticsInterop.h>)
+#import <FirebaseCrashlytics/FIRAnalyticsInterop.h>
+#import <FirebaseCrashlytics/FIRCLSAnalyticsManager.h>
+#else
+#import "FIRAnalyticsInterop.h"
+#import "FIRCLSAnalyticsManager.h"
+#endif
+#endif
+
 #import <firebase_core/FLTFirebasePluginRegistry.h>
 
 NSString *const kFLTFirebaseCrashlyticsChannelName = @"plugins.flutter.io/firebase_crashlytics";
@@ -17,6 +31,7 @@ NSString *const kCrashlyticsArgumentReason = @"reason";
 NSString *const kCrashlyticsArgumentIdentifier = @"identifier";
 NSString *const kCrashlyticsArgumentKey = @"key";
 NSString *const kCrashlyticsArgumentValue = @"value";
+NSString *const kCrashlyticsArgumentFatal = @"fatal";
 
 NSString *const kCrashlyticsArgumentFile = @"file";
 NSString *const kCrashlyticsArgumentLine = @"line";
@@ -25,6 +40,18 @@ NSString *const kCrashlyticsArgumentMethod = @"method";
 NSString *const kCrashlyticsArgumentEnabled = @"enabled";
 NSString *const kCrashlyticsArgumentUnsentReports = @"unsentReports";
 NSString *const kCrashlyticsArgumentDidCrashOnPreviousExecution = @"didCrashOnPreviousExecution";
+
+#if TARGET_OS_OSX
+// macOS platform does not support analytics
+#else
+@interface FIRCLSAnalyticsManager ()
+@property(nonatomic, strong) id<FIRAnalyticsInterop> analytics;
+@end
+
+@interface FIRCrashlytics ()
+@property(nonatomic, strong) FIRCLSAnalyticsManager *analyticsManager;
+@end
+#endif
 
 @interface FLTFirebaseCrashlyticsPlugin ()
 @end
@@ -42,6 +69,9 @@ NSString *const kCrashlyticsArgumentDidCrashOnPreviousExecution = @"didCrashOnPr
     instance = [[FLTFirebaseCrashlyticsPlugin alloc] init];
     // Register with the Flutter Firebase plugin registry.
     [[FLTFirebasePluginRegistry sharedInstance] registerFirebasePlugin:instance];
+    [[FIRCrashlytics crashlytics] setDevelopmentPlatformName:@"Flutter"];
+    // We can't currently get the Flutter plugin version number, so use -1.
+    [[FIRCrashlytics crashlytics] setDevelopmentPlatformVersion:@"-1"];
   });
 
   return instance;
@@ -104,6 +134,7 @@ NSString *const kCrashlyticsArgumentDidCrashOnPreviousExecution = @"didCrashOnPr
   NSString *information = arguments[kCrashlyticsArgumentInformation];
   NSString *dartExceptionMessage = arguments[kCrashlyticsArgumentException];
   NSArray *errorElements = arguments[kCrashlyticsArgumentStackTraceElements];
+  BOOL fatal = [arguments[kCrashlyticsArgumentFatal] boolValue];
 
   // Log additional information so it's captured on the Firebase Crashlytics dashboard.
   if ([information length] != 0) {
@@ -123,6 +154,18 @@ NSString *const kCrashlyticsArgumentDidCrashOnPreviousExecution = @"didCrashOnPr
                                           forKey:@"flutter_error_reason"];
   } else {
     reason = dartExceptionMessage;
+  }
+
+  if (fatal) {
+    NSTimeInterval timeInterval = [NSDate date].timeIntervalSince1970;
+    [[FIRCrashlytics crashlytics] setCustomValue:@(llrint(timeInterval))
+                                          forKey:@"com.firebase.crashlytics.flutter.fatal"];
+#if TARGET_OS_OSX
+    // macOS platform does not support analytics
+#else
+    id<FIRAnalyticsInterop> analytics = [[FIRCrashlytics crashlytics].analyticsManager analytics];
+    [FIRCLSAnalyticsManager logCrashWithTimeStamp:timeInterval toAnalytics:analytics];
+#endif
   }
 
   // Log additional custom value to match Android.
@@ -189,8 +232,12 @@ NSString *const kCrashlyticsArgumentDidCrashOnPreviousExecution = @"didCrashOnPr
 #pragma mark - Utilities
 
 - (FIRStackFrame *)generateFrame:(NSDictionary *)errorElement {
+  NSString *methodName = [errorElement valueForKey:kCrashlyticsArgumentMethod];
+  NSString *className = [errorElement valueForKey:@"class"];
+  NSString *symbol = [NSString stringWithFormat:@"%@.%@", className, methodName];
+
   FIRStackFrame *frame = [FIRStackFrame
-      stackFrameWithSymbol:[errorElement valueForKey:kCrashlyticsArgumentMethod]
+      stackFrameWithSymbol:symbol
                       file:[errorElement valueForKey:kCrashlyticsArgumentFile]
                       line:[[errorElement valueForKey:kCrashlyticsArgumentLine] intValue]];
   return frame;

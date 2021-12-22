@@ -1,3 +1,71 @@
+## 2.4.4
+
+ - **REFACTOR**: fix all `unnecessary_import` analyzer issues introduced with Flutter 2.8. ([7f0e82c9](https://github.com/FirebaseExtended/flutterfire/commit/7f0e82c978a3f5a707dd95c7e9136a3e106ff75e))
+ - **FIX**: set build id as not required, to allow Dart default app initialization (#7594). ([c15fdda3](https://github.com/FirebaseExtended/flutterfire/commit/c15fdda33b447ddd0c8e066e9c9ec7cabf9cd6fd))
+ - **FIX**: Return app constants for default app only on `Android`. (#7592). ([b803c425](https://github.com/FirebaseExtended/flutterfire/commit/b803c425b420acae155fea93a62ab9b3de4556a5))
+
+## 2.4.3
+
+ - Update a dependency to the latest release.
+
+## 2.4.2
+
+ - Update a dependency to the latest release.
+
+## 2.4.1
+
+ - Update a dependency to the latest release.
+
+## 2.4.0
+
+ - **REFACTOR**: migrate remaining examples & e2e tests to null-safety (#7393).
+ - **FEAT**: log development platform to Crashlytics in Crashlytics iOS plugin (#7322).
+
+## 2.3.0
+
+ - **FEAT**: support initializing default `FirebaseApp` instances from Dart (#6549).
+
+## 2.2.5
+
+ - Update a dependency to the latest release.
+
+## 2.2.4
+
+ - **REFACTOR**: remove deprecated Flutter Android v1 Embedding usages, including in example app (#7158).
+
+## 2.2.3
+
+ - **FIX**: switch usage of `dumpErrorToConsole` to `presentError` to remove duplicate logging (#7046).
+ - **CHORE**: remove unused deprecated V1 embedding for android (#7127).
+
+## 2.2.2
+
+ - Update a dependency to the latest release.
+
+## 2.2.1
+
+ - Update a dependency to the latest release.
+
+## 2.2.0
+
+ - **STYLE**: enable additional lint rules (#6832).
+ - **FEAT**: lower iOS & macOS deployment targets for relevant plugins (#6757).
+
+## 2.1.1
+
+ - **FIX**: issue where build would fail with missing header (#6628).
+
+## 2.1.0
+
+ - **FIX**: improve stack trace symbol. "class.method" signature. (#6442).
+ - **FEAT**: submit analytics crash event on fatal - enables support for crash free users reporting (#5900).
+ - **CHORE**: rm deprecated jcenter repository (#6431).
+
+## 2.0.7
+
+ - **FIX**: improve stack trace symbol. "class.method" signature. (#6442).
+ - **CHORE**: rm deprecated jcenter repository (#6431).
+
 ## 2.0.6
 
  - Update a dependency to the latest release.

@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -14,6 +15,7 @@ class RemoteNotification {
   const RemoteNotification(
       {this.android,
       this.apple,
+      this.web,
       this.title,
       this.titleLocArgs = const <String>[],
       this.titleLocKey,
@@ -25,6 +27,7 @@ class RemoteNotification {
   factory RemoteNotification.fromMap(Map<String, dynamic> map) {
     AndroidNotification? _android;
     AppleNotification? _apple;
+    WebNotification? _web;
 
     if (map['android'] != null) {
       _android = AndroidNotification(
@@ -47,17 +50,27 @@ class RemoteNotification {
 
     if (map['apple'] != null) {
       _apple = AppleNotification(
-          badge: map['apple']['badge'],
-          subtitle: map['apple']['subtitle'],
-          subtitleLocArgs: _toList(map['apple']['subtitleLocArgs']),
-          subtitleLocKey: map['apple']['subtitleLocKey'],
-          imageUrl: map['apple']['imageUrl'],
-          sound: map['apple']['sound'] == null
-              ? null
-              : AppleNotificationSound(
-                  critical: map['apple']['sound']['critical'],
-                  name: map['apple']['sound']['name'],
-                  volume: map['apple']['sound']['volume']));
+        badge: map['apple']['badge'],
+        subtitle: map['apple']['subtitle'],
+        subtitleLocArgs: _toList(map['apple']['subtitleLocArgs']),
+        subtitleLocKey: map['apple']['subtitleLocKey'],
+        imageUrl: map['apple']['imageUrl'],
+        sound: map['apple']['sound'] == null
+            ? null
+            : AppleNotificationSound(
+                critical: map['apple']['sound']['critical'] ?? false,
+                name: map['apple']['sound']['name'],
+                volume: map['apple']['sound']['volume'] ?? 0,
+              ),
+      );
+    }
+
+    if (map['web'] != null) {
+      _web = WebNotification(
+        analyticsLabel: map['web']['analyticsLabel'],
+        image: map['web']['image'],
+        link: map['web']['link'],
+      );
     }
 
     return RemoteNotification(
@@ -69,6 +82,7 @@ class RemoteNotification {
       bodyLocKey: map['bodyLocKey'],
       android: _android,
       apple: _apple,
+      web: _web,
     );
   }
 
@@ -77,6 +91,9 @@ class RemoteNotification {
 
   /// Apple specific notification properties.
   final AppleNotification? apple;
+
+  /// Web specific notification properties.
+  final WebNotification? web;
 
   /// The notification title.
   final String? title;
@@ -219,4 +236,24 @@ List<String> _toList(dynamic value) {
   }
 
   return List<String>.from(value);
+}
+
+/// Web specific properties of a [RemoteNotification].
+class WebNotification {
+  const WebNotification({
+    this.analyticsLabel,
+    this.image,
+    this.link,
+  });
+
+  /// Optional message label for custom analytics.
+  final String? analyticsLabel;
+
+  /// The image URL for the notification.
+  ///
+  /// Will be `null` if the notification did not include an image.
+  final String? image;
+
+  /// The url which is typically being navigated to when the notification is clicked.
+  final String? link;
 }

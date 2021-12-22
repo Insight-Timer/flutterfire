@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -123,13 +124,13 @@ abstract class FirebaseAuthPlatform extends PlatformInterface {
 
   /// Changes this instance to point to an Auth emulator running locally.
   ///
-  /// Set the [host] and [port] of the local emulator, such as "http://localhost"
+  /// Set the [host] and [port] of the local emulator, such as "localhost"
   /// with port 9099
   ///
   /// Note: Must be called immediately, prior to accessing auth methods.
   /// Do not use with production credentials as emulator traffic is not encrypted.
-  Future<void> useEmulator(String host, int port) {
-    throw UnimplementedError('useEmulator() is not implemented');
+  Future<void> useAuthEmulator(String host, int port) {
+    throw UnimplementedError('useAuthEmulator() is not implemented');
   }
 
   /// Applies a verification code sent to the user by email or other out-of-band
@@ -317,13 +318,13 @@ abstract class FirebaseAuthPlatform extends PlatformInterface {
   /// On web platforms, if `null` is provided as the [languageCode] the Firebase
   /// project default language will be used. On native platforms, the device
   /// language will be used.
-  Future<void> setLanguageCode(String languageCode) {
+  Future<void> setLanguageCode(String? languageCode) {
     throw UnimplementedError('setLanguageCode() is not implemented');
   }
 
   /// Updates the current instance with the provided settings.
   ///
-  /// [appVerificationDisabledForTesting] This setting only applies to iOS and
+  /// [appVerificationDisabledForTesting] This setting applies to android, iOS and
   ///   web platforms. When set to `true`, this property disables app
   ///   verification for the purpose of testing phone authentication. For this
   ///   property to take effect, it needs to be set before handling a reCAPTCHA
@@ -337,10 +338,22 @@ abstract class FirebaseAuthPlatform extends PlatformInterface {
   ///
   ///   The default value is `false` (app verification is enabled).
   ///
-  /// [userAccessGroup] This setting only applies to iOS and MacOS platforms.
-  ///   When set, it allows you to share authentication state between
-  ///   applications. Set the property to your team group ID or set to `null`
-  ///   to remove sharing capabilities.
+  ///  [forceRecaptchaFlow] This setting applies to android only. When set to 'true',
+  ///  it forces the application verification to use the web reCAPTCHA flow for Phone Authentication.
+  ///  Once this has been called, every call to PhoneAuthProvider#verifyPhoneNumber() will skip the SafetyNet verification flow and use the reCAPTCHA flow instead.
+  ///  Calling this method a second time will overwrite the previously passed parameter.
+  ///
+  ///  [phoneNumber] & [smsCode] These settings apply to android only. The phone number and SMS code here must have been configured in the Firebase Console (Authentication > Sign In Method > Phone).
+  ///  Once this has been called, every call to PhoneAuthProvider#verifyPhoneNumber() with the same phone number as the one that is configured here will have onVerificationCompleted() triggered as the callback.
+  ///  Calling this method a second time will overwrite the previously passed parameters. Only one number can be configured at a given time.
+  ///  Calling this method with either parameter set to null removes this functionality until valid parameters are passed.
+  ///  Verifying a phone number other than the one configured here will trigger normal behavior. If the phone number is configured as a test phone number in the console, the regular testing flow occurs. Otherwise, normal phone number verification will take place.
+  ///  When this is set and PhoneAuthProvider#verifyPhoneNumber() is called with a matching phone number, PhoneAuthProvider.OnVerificationStateChangedCallbacks.onCodeAutoRetrievalTimeOut(String) will never be called.
+  ///
+  ///  [userAccessGroup] This setting only applies to iOS and MacOS platforms.
+  ///  When set, it allows you to share authentication state between
+  ///  applications. Set the property to your team group ID or set to `null`
+  ///  to remove sharing capabilities.
   ///
   ///   Key Sharing capabilities must be enabled for your app via XCode (Project
   ///   settings > Capabilities). To learn more, visit the
@@ -348,6 +361,9 @@ abstract class FirebaseAuthPlatform extends PlatformInterface {
   Future<void> setSettings({
     bool? appVerificationDisabledForTesting,
     String? userAccessGroup,
+    String? phoneNumber,
+    String? smsCode,
+    bool? forceRecaptchaFlow,
   }) {
     throw UnimplementedError('setSettings() is not implemented');
   }
@@ -504,7 +520,7 @@ abstract class FirebaseAuthPlatform extends PlatformInterface {
   /// Starts a sign-in flow for a phone number.
   ///
   /// You can optionally provide a [RecaptchaVerifier] instance to control the
-  /// reCAPTCHA widget apperance and behaviour.
+  /// reCAPTCHA widget apperance and behavior.
   ///
   /// Once the reCAPTCHA verification has completed, called [ConfirmationResult.confirm]
   /// with the users SMS verification code to complete the authentication flow.

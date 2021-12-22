@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2017, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -9,6 +10,7 @@ import 'package:cloud_firestore_web/src/internals.dart';
 import 'package:cloud_firestore_web/src/load_bundle_task_web.dart';
 import 'package:cloud_firestore_web/src/utils/web_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core_web/firebase_core_web.dart';
 import 'package:firebase_core_web/firebase_core_web_interop.dart'
     as core_interop;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -24,19 +26,24 @@ import 'src/interop/firestore.dart' as firestore_interop;
 /// Web implementation for [FirebaseFirestorePlatform]
 /// delegates calls to firestore web plugin
 class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
-  /// instance of Firestore from the web plugin
-  final firestore_interop.Firestore _webFirestore;
+  /// instance of Analytics from the web plugin
+  firestore_interop.Firestore? _webFirestore;
+
+  /// Lazily initialize [_webFirestore] on first method call
+  firestore_interop.Firestore get _delegate {
+    return _webFirestore ??=
+        firestore_interop.getFirestoreInstance(core_interop.app(app.name));
+  }
 
   /// Called by PluginRegistry to register this plugin for Flutter Web
   static void registerWith(Registrar registrar) {
+    FirebaseCoreWeb.registerService('firestore');
     FirebaseFirestorePlatform.instance = FirebaseFirestoreWeb();
   }
 
   /// Builds an instance of [FirebaseFirestoreWeb] with an optional [FirebaseApp] instance
   /// If [app] is null then the created instance will use the default [FirebaseApp]
-  FirebaseFirestoreWeb({FirebaseApp? app})
-      : _webFirestore = firestore_interop.getFirestoreInstance(core_interop.app(app?.name)),
-        super(appInstance: app) {
+  FirebaseFirestoreWeb({FirebaseApp? app}) : super(appInstance: app) {
     FieldValueFactoryPlatform.instance = FieldValueFactoryWeb();
   }
 
@@ -47,52 +54,66 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
 
   @override
   CollectionReferencePlatform collection(String collectionPath) {
-    return CollectionReferenceWeb(this, _webFirestore, collectionPath);
+    return CollectionReferenceWeb(this, _delegate, collectionPath);
   }
 
   @override
-  WriteBatchPlatform batch() => WriteBatchWeb(_webFirestore);
+  WriteBatchPlatform batch() => WriteBatchWeb(_delegate);
 
   @override
   Future<void> clearPersistence() {
-    return guard(_webFirestore.clearPersistence);
+    return guard(_delegate.clearPersistence);
+  }
+
+  @override
+  void useEmulator(String host, int port) {
+    return _delegate.useEmulator(host, port);
   }
 
   @override
   QueryPlatform collectionGroup(String collectionPath) {
-    return QueryWeb(this, collectionPath, _webFirestore.collectionGroup(collectionPath), isCollectionGroupQuery: true);
+    return QueryWeb(
+        this, collectionPath, _delegate.collectionGroup(collectionPath),
+        isCollectionGroupQuery: true);
   }
 
   @override
   Future<void> disableNetwork() {
-    return guard(_webFirestore.disableNetwork);
+    return guard(_delegate.disableNetwork);
   }
 
   @override
-  DocumentReferencePlatform doc(String documentPath) => DocumentReferenceWeb(this, _webFirestore, documentPath);
+  DocumentReferencePlatform doc(String documentPath) =>
+      DocumentReferenceWeb(this, _delegate, documentPath);
 
   @override
   Future<void> enableNetwork() {
-    return guard(_webFirestore.enableNetwork);
+    return guard(_delegate.enableNetwork);
   }
 
   @override
   Stream<void> snapshotsInSync() {
-    return _webFirestore.snapshotsInSync();
+    return _delegate.snapshotsInSync();
   }
 
   @override
   Future<T?> runTransaction<T>(TransactionHandler<T> transactionHandler,
       {Duration timeout = const Duration(seconds: 30)}) async {
     await guard(() {
-      return _webFirestore.runTransaction((transaction) async {
-        return transactionHandler(TransactionWeb(this, _webFirestore, transaction!));
+      return _delegate.runTransaction((transaction) async {
+        return transactionHandler(
+            TransactionWeb(this, _delegate, transaction!));
       }).timeout(timeout);
     });
     // Workaround for 'Runtime type information not available for type_variable_local'
     // See: https://github.com/dart-lang/sdk/issues/29722
 
     return null;
+  }
+
+  @override
+  Settings get settings {
+    return const Settings();
   }
 
   @override
@@ -109,32 +130,43 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
     }
 
     if (settings.host != null && settings.sslEnabled != null) {
-      _webFirestore.settings(
-          firestore_interop.Settings(cacheSizeBytes: cacheSizeBytes, host: settings.host, ssl: settings.sslEnabled));
+      _delegate.settings(firestore_interop.Settings(
+          cacheSizeBytes: cacheSizeBytes,
+          host: settings.host,
+          ssl: settings.sslEnabled));
     } else {
-      _webFirestore.settings(firestore_interop.Settings(cacheSizeBytes: cacheSizeBytes));
+      _delegate
+          .settings(firestore_interop.Settings(cacheSizeBytes: cacheSizeBytes));
     }
   }
 
   /// Enable persistence of Firestore data.
   @override
   Future<void> enablePersistence([PersistenceSettings? settings]) {
-    return guard(_webFirestore.enablePersistence);
+    if (settings != null) {
+      firestore_interop.PersistenceSettings interopSettings =
+          firestore_interop.PersistenceSettings(
+              synchronizeTabs: settings.synchronizeTabs);
+
+      return guard(() => _delegate.enablePersistence(interopSettings));
+    }
+
+    return guard(_delegate.enablePersistence);
   }
 
   @override
   Future<void> terminate() {
-    return guard(_webFirestore.terminate);
+    return guard(_delegate.terminate);
   }
 
   @override
   Future<void> waitForPendingWrites() {
-    return guard(_webFirestore.waitForPendingWrites);
+    return guard(_delegate.waitForPendingWrites);
   }
 
   @override
   LoadBundleTaskPlatform loadBundle(Uint8List bundle) {
-    return LoadBundleTaskWeb(_webFirestore.loadBundle(bundle));
+    return LoadBundleTaskWeb(_delegate.loadBundle(bundle));
   }
 
   @override
@@ -142,7 +174,7 @@ class FirebaseFirestoreWeb extends FirebaseFirestorePlatform {
     String name, {
     GetOptions options = const GetOptions(),
   }) async {
-    firestore_interop.Query? query = await _webFirestore.namedQuery(name);
+    firestore_interop.Query? query = await _delegate.namedQuery(name);
     firestore_interop.QuerySnapshot snapshot =
         await query.get(convertGetOptions(options));
 

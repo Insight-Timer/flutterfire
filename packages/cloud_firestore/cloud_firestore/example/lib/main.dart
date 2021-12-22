@@ -2,24 +2,21 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:cloud_firestore_example/movie.dart';
+import 'package:cloud_firestore_example/firebase_config.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Requires that a Firestore emulator is running locally.
 /// See https://firebase.flutter.dev/docs/firestore/usage#emulator-usage
-bool USE_FIRESTORE_EMULATOR = false;
+bool shouldUseFirestoreEmulator = false;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  if (USE_FIRESTORE_EMULATOR) {
-    FirebaseFirestore.instance.settings = const Settings(
-      host: 'localhost:8080',
-      sslEnabled: false,
-      persistenceEnabled: false,
-    );
+  await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
+
+  if (shouldUseFirestoreEmulator) {
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
   }
   runApp(FirestoreExampleApp());
 }
@@ -92,21 +89,7 @@ class FilmList extends StatefulWidget {
 }
 
 class _FilmListState extends State<FilmList> {
-  late Query<Movie> _moviesQuery;
-  late Stream<QuerySnapshot<Movie>> _movies;
-
-  @override
-  void initState() {
-    super.initState();
-    _updateMoviesQuery(MovieQuery.year);
-  }
-
-  void _updateMoviesQuery(MovieQuery query) {
-    setState(() {
-      _moviesQuery = moviesRef.queryBy(query);
-      _movies = _moviesQuery.snapshots();
-    });
-  }
+  MovieQuery query = MovieQuery.year;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +116,7 @@ class _FilmListState extends State<FilmList> {
         ),
         actions: <Widget>[
           PopupMenuButton<MovieQuery>(
-            onSelected: _updateMoviesQuery,
+            onSelected: (value) => setState(() => query = value),
             icon: const Icon(Icons.sort),
             itemBuilder: (BuildContext context) {
               return [
@@ -178,7 +161,7 @@ class _FilmListState extends State<FilmList> {
         ],
       ),
       body: StreamBuilder<QuerySnapshot<Movie>>(
-        stream: _movies,
+        stream: moviesRef.queryBy(query).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -228,9 +211,7 @@ class _MovieItem extends StatelessWidget {
   Widget get poster {
     return SizedBox(
       width: 100,
-      child: Center(
-        child: Image.network(movie.poster),
-      ),
+      child: Image.network(movie.poster),
     );
   }
 
@@ -265,7 +246,8 @@ class _MovieItem extends StatelessWidget {
   Widget get metadata {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -309,6 +291,7 @@ class _MovieItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4, top: 4),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           poster,
           Flexible(child: details),
@@ -404,5 +387,49 @@ class _LikesState extends State<Likes> {
         Text('$_likes likes'),
       ],
     );
+  }
+}
+
+@immutable
+class Movie {
+  Movie({
+    required this.genre,
+    required this.likes,
+    required this.poster,
+    required this.rated,
+    required this.runtime,
+    required this.title,
+    required this.year,
+  });
+
+  Movie.fromJson(Map<String, Object?> json)
+      : this(
+          genre: (json['genre']! as List).cast<String>(),
+          likes: json['likes']! as int,
+          poster: json['poster']! as String,
+          rated: json['rated']! as String,
+          runtime: json['runtime']! as String,
+          title: json['title']! as String,
+          year: json['year']! as int,
+        );
+
+  final String poster;
+  final int likes;
+  final String title;
+  final int year;
+  final String runtime;
+  final String rated;
+  final List<String> genre;
+
+  Map<String, Object?> toJson() {
+    return {
+      'genre': genre,
+      'likes': likes,
+      'poster': poster,
+      'rated': rated,
+      'runtime': runtime,
+      'title': title,
+      'year': year,
+    };
   }
 }

@@ -1,17 +1,16 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2019 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../firebase_auth_platform_interface.dart';
-import '../firebase_auth_exception.dart';
-import '../platform_interface/platform_interface_user_credential.dart';
 import 'method_channel_user.dart';
 import 'method_channel_user_credential.dart';
 import 'utils/exception.dart';
@@ -190,7 +189,7 @@ class MethodChannelFirebaseAuth extends FirebaseAuthPlatform {
   }
 
   @override
-  Future<void> useEmulator(String host, int port) async {
+  Future<void> useAuthEmulator(String host, int port) async {
     try {
       await channel.invokeMethod<void>(
           'Auth#useEmulator',
@@ -344,7 +343,7 @@ class MethodChannelFirebaseAuth extends FirebaseAuthPlatform {
   }
 
   @override
-  Future<void> setLanguageCode(String languageCode) async {
+  Future<void> setLanguageCode(String? languageCode) async {
     try {
       Map<String, dynamic> data =
           (await channel.invokeMapMethod<String, dynamic>(
@@ -364,15 +363,39 @@ class MethodChannelFirebaseAuth extends FirebaseAuthPlatform {
   Future<void> setSettings({
     bool? appVerificationDisabledForTesting,
     String? userAccessGroup,
+    String? phoneNumber,
+    String? smsCode,
+    bool? forceRecaptchaFlow,
   }) async {
+    if (phoneNumber != null && smsCode == null ||
+        phoneNumber == null && smsCode != null) {
+      throw ArgumentError(
+        "The [smsCode] and the [phoneNumber] must both be either 'null' or a 'String''.",
+      );
+    }
+    // argument for every platform
+    var arguments = <String, dynamic>{
+      'appVerificationDisabledForTesting': appVerificationDisabledForTesting,
+    };
+
+    if (Platform.isIOS || Platform.isMacOS) {
+      arguments['userAccessGroup'] = userAccessGroup;
+    }
+
+    if (Platform.isAndroid) {
+      if (phoneNumber != null && smsCode != null) {
+        arguments['phoneNumber'] = phoneNumber;
+        arguments['smsCode'] = smsCode;
+      }
+
+      if (forceRecaptchaFlow != null) {
+        arguments['forceRecaptchaFlow'] = forceRecaptchaFlow;
+      }
+    }
+
     try {
       await channel.invokeMethod(
-          'Auth#setSettings',
-          _withChannelDefaults({
-            'appVerificationDisabledForTesting':
-                appVerificationDisabledForTesting,
-            'userAccessGroup': userAccessGroup,
-          }));
+          'Auth#setSettings', _withChannelDefaults(arguments));
     } catch (e) {
       throw convertPlatformException(e);
     }

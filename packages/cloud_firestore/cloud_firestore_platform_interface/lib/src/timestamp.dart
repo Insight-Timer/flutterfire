@@ -4,7 +4,7 @@
 
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 const int _kThousand = 1000;
 const int _kMillion = 1000000;
@@ -42,7 +42,7 @@ class Timestamp implements Comparable<Timestamp> {
 
   /// Create a [Timestamp] fromMicrosecondsSinceEpoch
   factory Timestamp.fromMicrosecondsSinceEpoch(int microseconds) {
-    final int seconds = (microseconds ~/ _kMillion).floor();
+    final int seconds = microseconds ~/ _kMillion;
     final int nanoseconds = (microseconds - seconds * _kMillion) * _kThousand;
     return Timestamp(seconds, nanoseconds);
   }
@@ -55,7 +55,8 @@ class Timestamp implements Comparable<Timestamp> {
   /// Create a [Timestamp] from [DateTime].now()
   factory Timestamp.now() {
     return Timestamp.fromMicrosecondsSinceEpoch(
-        DateTime.now().microsecondsSinceEpoch);
+      DateTime.now().microsecondsSinceEpoch,
+    );
   }
 
   final int _seconds;

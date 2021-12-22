@@ -5,7 +5,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore_platform_interface/src/method_channel/method_channel_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import './mock.dart';
@@ -44,13 +43,14 @@ void main() {
   setUpAll(() async {
     await Firebase.initializeApp();
     FirebaseApp secondaryApp = await Firebase.initializeApp(
-        name: 'foo',
-        options: const FirebaseOptions(
-          apiKey: '123',
-          appId: '123',
-          messagingSenderId: '123',
-          projectId: '123',
-        ));
+      name: 'foo',
+      options: const FirebaseOptions(
+        apiKey: '123',
+        appId: '123',
+        messagingSenderId: '123',
+        projectId: '123',
+      ),
+    );
 
     firestore = FirebaseFirestore.instance;
     firestoreSecondary = FirebaseFirestore.instanceFor(app: secondaryApp);

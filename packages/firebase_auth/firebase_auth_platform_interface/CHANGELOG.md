@@ -1,3 +1,64 @@
+## 6.1.9
+
+ - **REFACTOR**: fix all `unnecessary_import` analyzer issues introduced with Flutter 2.8. ([7f0e82c9](https://github.com/FirebaseExtended/flutterfire/commit/7f0e82c978a3f5a707dd95c7e9136a3e106ff75e))
+
+## 6.1.8
+
+ - Update a dependency to the latest release.
+
+## 6.1.7
+
+ - **DOCS**: Fix typos and remove unused imports (#7504).
+
+## 6.1.6
+
+ - Update a dependency to the latest release.
+
+## 6.1.5
+
+ - Update a dependency to the latest release.
+
+## 6.1.4
+
+ - Update a dependency to the latest release.
+
+## 6.1.3
+
+ - Update a dependency to the latest release.
+
+## 6.1.2
+
+ - Update a dependency to the latest release.
+
+## 6.1.1
+
+ - **TEST**: Fix pre-existing HintCode.UNNECESSARY_TYPE_CHECK_TRUE (#6931).
+ - **FIX**: allow setLanguage to accept null (#7050).
+
+## 6.1.0
+
+ - **FEAT**: Add support for `secret` on `OAuthCredential` on web (#6830).
+ - **FEAT**: expose linkWithPopup() & correctly parse credentials in exceptions (#6562).
+
+## 6.0.1
+
+ - Update a dependency to the latest release.
+
+## 6.0.0
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: setSettings now possible for android (#6367).
+ - **CHORE**: publish packages (#6513).
+ - **BREAKING** **FEAT**: use<product>Emulator(host, port) API update (#6439).
+
+## 5.0.0
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: setSettings now possible for android (#6367).
+ - **BREAKING** **FEAT**: useAuthEmulator(host, port) API update.
+
 ## 4.3.1
 
  - Update a dependency to the latest release.

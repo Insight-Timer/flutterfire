@@ -11,6 +11,8 @@ analyzer:
     # We explicitly enabled even conflicting rules and are fixing the conflict
     # in this file
     included_file_warning: ignore
+  exclude:
+    - packages/**/example/lib/generated_plugin_registrant.dart
 
 linter:
   rules:
@@ -42,6 +44,9 @@ linter:
     public_member_api_docs: false
 
     #############
+
+    # Far too verbose, and not that big of a deal when using parameter_assignments
+    prefer_final_parameters: false
 
     # Personal preference. I don't find it more readable
     cascade_invocations: false

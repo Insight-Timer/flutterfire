@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -87,6 +88,8 @@ class Firestore extends JsObjectWrapper<firestore_interop.FirestoreJsImpl> {
   }
 
   void settings(firestore_interop.Settings settings) => jsObject.settings(settings);
+
+  void useEmulator(String host, int port) => jsObject.useEmulator(host, port);
 
   Future enableNetwork() => handleThenable(jsObject.enableNetwork());
 

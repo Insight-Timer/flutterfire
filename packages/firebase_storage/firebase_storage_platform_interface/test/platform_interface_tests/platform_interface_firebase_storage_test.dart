@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2020, the Chromium project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -149,9 +150,9 @@ void main() {
 
     test('throws if ref()', () {
       try {
-        firebaseStoragePlatform!.useEmulator('foo', 1234);
+        firebaseStoragePlatform!.useStorageEmulator('foo', 1234);
       } on UnimplementedError catch (e) {
-        expect(e.message, equals('useEmulator() is not implemented'));
+        expect(e.message, equals('useStorageEmulator() is not implemented'));
         return;
       }
       fail('Should have thrown an [UnimplementedError]');

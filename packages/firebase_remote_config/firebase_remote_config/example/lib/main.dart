@@ -1,3 +1,4 @@
+// ignore_for_file: require_trailing_commas
 // Copyright 2019 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -76,7 +77,17 @@ class WelcomeWidget extends AnimatedWidget {
 }
 
 Future<RemoteConfig> setupRemoteConfig() async {
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+        apiKey: 'AIzaSyAgUhHU8wSJgO5MVNy95tMT07NEjzMOfz0',
+        authDomain: 'react-native-firebase-testing.firebaseapp.com',
+        databaseURL: 'https://react-native-firebase-testing.firebaseio.com',
+        projectId: 'react-native-firebase-testing',
+        storageBucket: 'react-native-firebase-testing.appspot.com',
+        messagingSenderId: '448618578101',
+        appId: '1:448618578101:web:772d484dc9eb15e9ac3efc',
+        measurementId: 'G-0N1G9FLDZE'),
+  );
   final RemoteConfig remoteConfig = RemoteConfig.instance;
   await remoteConfig.setConfigSettings(RemoteConfigSettings(
     fetchTimeout: const Duration(seconds: 10),

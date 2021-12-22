@@ -50,7 +50,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugins.firebase.core.FlutterFirebasePlugin;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,12 +74,6 @@ public class FlutterFirebaseAuthPlugin
   private Activity activity;
 
   private final Map<EventChannel, StreamHandler> streamHandlers = new HashMap<>();
-
-  @SuppressWarnings("unused")
-  public static void registerWith(PluginRegistry.Registrar registrar) {
-    FlutterFirebaseAuthPlugin instance = new FlutterFirebaseAuthPlugin();
-    instance.initInstance(registrar.messenger());
-  }
 
   static Map<String, Object> parseAuthCredential(AuthCredential authCredential) {
     if (authCredential == null) {
@@ -606,9 +599,35 @@ public class FlutterFirebaseAuthPlugin
         });
   }
 
-  // Settings are a no-op on Android
-  private Task<Void> setSettings() {
-    return Tasks.call(cachedThreadPool, () -> null);
+  private Task<Void> setSettings(Map<String, Object> arguments) {
+    return Tasks.call(
+        cachedThreadPool,
+        () -> {
+          FirebaseAuth firebaseAuth = getAuth(arguments);
+          Boolean appVerificationDisabledForTesting =
+              (Boolean) arguments.get(Constants.APP_VERIFICATION_DISABLED_FOR_TESTING);
+          Boolean forceRecaptchaFlow = (Boolean) arguments.get(Constants.FORCE_RECAPTCHA_FLOW);
+          String phoneNumber = (String) arguments.get(Constants.PHONE_NUMBER);
+          String smsCode = (String) arguments.get(Constants.SMS_CODE);
+
+          if (appVerificationDisabledForTesting != null) {
+            firebaseAuth
+                .getFirebaseAuthSettings()
+                .setAppVerificationDisabledForTesting(appVerificationDisabledForTesting);
+          }
+
+          if (forceRecaptchaFlow != null) {
+            firebaseAuth.getFirebaseAuthSettings().forceRecaptchaFlowForTesting(forceRecaptchaFlow);
+          }
+
+          if (phoneNumber != null && smsCode != null) {
+            firebaseAuth
+                .getFirebaseAuthSettings()
+                .setAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, smsCode);
+          }
+
+          return null;
+        });
   }
 
   private Task<Map<String, Object>> signInAnonymously(Map<String, Object> arguments) {
@@ -1035,7 +1054,7 @@ public class FlutterFirebaseAuthPlugin
         methodCallTask = setLanguageCode(call.arguments());
         break;
       case "Auth#setSettings":
-        methodCallTask = setSettings();
+        methodCallTask = setSettings(call.arguments());
         break;
       case "Auth#signInAnonymously":
         methodCallTask = signInAnonymously(call.arguments());
