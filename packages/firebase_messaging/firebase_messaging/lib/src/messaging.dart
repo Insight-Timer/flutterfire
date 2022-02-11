@@ -272,6 +272,19 @@ class FirebaseMessaging extends FirebasePluginPlatform {
     _assertTopicName(topic);
     return _delegate.unsubscribeFromTopic(topic);
   }
+
+  /// suspend notification (android only)
+  /// only handle braze notification for suspension
+  Future<void> suspendNotification(
+      {required Map<String, String> messageFilters}) async {
+    await _delegate.suspendNotification(messageFilters: messageFilters);
+  }
+
+  /// resume notification (android only)
+  /// only handle braze notification for suspension
+  Future<void> resumeNotification() async {
+    await _delegate.resumeNotification();
+  }
 }
 
 void _assertTopicName(String topic) {

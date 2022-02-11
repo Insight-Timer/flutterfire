@@ -211,6 +211,10 @@ abstract class FirebaseFirestorePlatform extends PlatformInterface {
     throw UnimplementedError('waitForPendingWrites() is not implemented');
   }
 
+  Future<void> enableLogging(bool enable) {
+    throw UnimplementedError('enableLogging is not implemented');
+  }
+
   @override
   //ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) =>

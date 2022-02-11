@@ -322,4 +322,16 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
       throw convertPlatformException(e);
     }
   }
+
+  @override
+  Future<void> enableLogging(bool enable) async {
+    try {
+      await channel
+          .invokeMethod<void>('Firestore#enableLogging', <String, dynamic>{
+        'enable': enable,
+      });
+    } catch (e) {
+      throw convertPlatformException(e);
+    }
+  }
 }
