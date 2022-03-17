@@ -1286,7 +1286,12 @@ NSString *const kErrMsgInvalidCredential =
     userData[@"tenantId"] = [NSNull null];
   }
 
-  userData[@"refreshToken"] = user.refreshToken;
+  NSString *refreshToken = user.refreshToken;
+  if (refreshToken != nil) {
+    userData[@"refreshToken"] = refreshToken;
+  } else {
+    userData[@"refreshToken"] = [NSNull null];
+  }
   return userData;
 }
 
