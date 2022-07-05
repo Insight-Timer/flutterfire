@@ -14,7 +14,7 @@ class FakeCollectionReference<Value>
   Future<FakeQuerySnapshot<Value>> get([GetOptions? options]) async {
     return FakeQuerySnapshot<Value>(
       valueListenable.value
-          .map((e) => FakeFirestoreQueryDocumentSnapshot(e))
+          .map(FakeFirestoreQueryDocumentSnapshot.new)
           .toList(),
     );
   }
@@ -30,7 +30,7 @@ class FakeCollectionReference<Value>
       controller.add(
         FakeQuerySnapshot<Value>(
           valueListenable.value
-              .map((e) => FakeFirestoreQueryDocumentSnapshot(e))
+              .map(FakeFirestoreQueryDocumentSnapshot.new)
               .toList(),
         ),
       );
@@ -66,6 +66,36 @@ class FakeCollectionReference<Value>
 
   @override
   QueryReference<FakeQuerySnapshot<Value>> limitToLast(int limit) {
+    throw UnimplementedError();
+  }
+
+  @override
+  QueryReference<FakeQuerySnapshot<Value>> orderByDocumentId({
+    bool? descending,
+    String? startAt,
+    String? startAfter,
+    String? endAt,
+    String? endBefore,
+    QuerySnapshot<FakeQuerySnapshot<Value>>? startAtDocument,
+    QuerySnapshot<FakeQuerySnapshot<Value>>? endAtDocument,
+    QuerySnapshot<FakeQuerySnapshot<Value>>? endBeforeDocument,
+    QuerySnapshot<FakeQuerySnapshot<Value>>? startAfterDocument,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  QueryReference<FakeQuerySnapshot<Value>> whereDocumentId({
+    String? isEqualTo,
+    String? isNotEqualTo,
+    String? isLessThan,
+    String? isLessThanOrEqualTo,
+    String? isGreaterThan,
+    String? isGreaterThanOrEqualTo,
+    bool? isNull,
+    List<String>? whereIn,
+    List<String>? whereNotIn,
+  }) {
     throw UnimplementedError();
   }
 }
