@@ -28,6 +28,12 @@ class SignedOutAction extends FlutterFireUIAction {
   SignedOutAction(this.callback);
 }
 
+class Cancel extends FlutterFireUIAction {
+  final void Function(BuildContext context) callback;
+
+  Cancel(this.callback);
+}
+
 class FlutterFireUIActions extends InheritedWidget {
   final List<FlutterFireUIAction> actions;
 
@@ -80,6 +86,8 @@ class FlutterfireUIAuthActionsElement extends InheritedElement {
             action.invoke(this, newState);
           }
         }
+
+        return null;
       },
       child: super.build(),
     );

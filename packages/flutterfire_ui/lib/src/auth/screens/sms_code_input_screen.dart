@@ -23,9 +23,10 @@ class SMSCodeInputScreen extends StatelessWidget {
   final SideBuilder? sideBuilder;
   final HeaderBuilder? headerBuilder;
   final double? headerMaxExtent;
-  final double? breakpoint;
   final int? contentFlex;
   final double? maxWidth;
+  final double breakpoint;
+  final Set<FlutterFireUIStyle>? styles;
 
   const SMSCodeInputScreen({
     Key? key,
@@ -37,9 +38,10 @@ class SMSCodeInputScreen extends StatelessWidget {
     this.sideBuilder,
     this.headerBuilder,
     this.headerMaxExtent,
-    this.breakpoint,
+    this.breakpoint = 500,
     this.contentFlex,
     this.maxWidth,
+    this.styles,
   }) : super(key: key);
 
   void _reset() {
@@ -56,41 +58,44 @@ class SMSCodeInputScreen extends StatelessWidget {
         _reset();
         return true;
       },
-      child: FlutterFireUIActions(
-        actions: actions ?? const [],
-        child: UniversalScaffold(
-          body: Center(
-            child: ResponsivePage(
-              breakpoint: 400,
-              maxWidth: maxWidth,
-              desktopLayoutDirection: desktopLayoutDirection,
-              sideBuilder: sideBuilder,
-              headerBuilder: headerBuilder,
-              headerMaxExtent: headerMaxExtent,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SMSCodeInputView(
-                    auth: auth,
-                    action: action,
-                    flowKey: flowKey,
-                    onCodeVerified: () {
-                      if (actions != null) return;
+      child: FlutterFireUITheme(
+        styles: styles ?? const {},
+        child: FlutterFireUIActions(
+          actions: actions ?? const [],
+          child: UniversalScaffold(
+            body: Center(
+              child: ResponsivePage(
+                breakpoint: breakpoint,
+                maxWidth: maxWidth,
+                desktopLayoutDirection: desktopLayoutDirection,
+                sideBuilder: sideBuilder,
+                headerBuilder: headerBuilder,
+                headerMaxExtent: headerMaxExtent,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SMSCodeInputView(
+                      auth: auth,
+                      action: action,
+                      flowKey: flowKey,
+                      onCodeVerified: () {
+                        if (actions != null) return;
 
-                      Navigator.of(context).popUntil((route) {
-                        return route.isFirst;
-                      });
-                    },
-                  ),
-                  UniversalButton(
-                    variant: ButtonVariant.text,
-                    text: l.goBackButtonLabel,
-                    onPressed: () {
-                      _reset();
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
+                        Navigator.of(context).popUntil((route) {
+                          return route.isFirst;
+                        });
+                      },
+                    ),
+                    UniversalButton(
+                      variant: ButtonVariant.text,
+                      text: l.goBackButtonLabel,
+                      onPressed: () {
+                        _reset();
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                ),
               ),
             ),
           ),

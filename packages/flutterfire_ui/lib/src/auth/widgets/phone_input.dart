@@ -86,6 +86,8 @@ class PhoneInput extends StatefulWidget {
     if (state.formKey.currentState!.validate()) {
       return state.phoneNumber;
     }
+
+    return null;
   }
 
   const PhoneInput({
@@ -265,7 +267,9 @@ class PhoneInputState extends State<PhoneInput> {
               SizedBox(
                 width: 90,
                 child: UniversalTextFormField(
-                  autofocus: false,
+                  autofillHints: const [
+                    AutofillHints.telephoneNumberCountryCode
+                  ],
                   controller: countryController,
                   prefix: const Text('+'),
                   placeholder: l.countryCode,
@@ -282,6 +286,7 @@ class PhoneInputState extends State<PhoneInput> {
               const SizedBox(width: 8),
               Expanded(
                 child: UniversalTextFormField(
+                  autofillHints: const [AutofillHints.telephoneNumberNational],
                   autofocus: true,
                   focusNode: numberFocusNode,
                   controller: numberController,

@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterfire_ui/i10n.dart';
 import '../widgets/internal/universal_text_form_field.dart';
 
 import '../validators.dart';
+
+final _whitespaceRegExp = RegExp(r'\s\b|\b\s');
 
 class EmailInput extends StatelessWidget {
   final FocusNode? focusNode;
@@ -26,12 +29,13 @@ class EmailInput extends StatelessWidget {
     final l = FlutterFireUILocalizations.labelsOf(context);
 
     return UniversalTextFormField(
+      autofillHints: const [AutofillHints.email],
       autofocus: autofocus ?? false,
       focusNode: focusNode,
       controller: controller,
       placeholder: l.emailInputLabel,
       keyboardType: TextInputType.emailAddress,
-      autocorrect: false,
+      inputFormatters: [FilteringTextInputFormatter.deny(_whitespaceRegExp)],
       validator: Validator.validateAll([
         NotEmpty(l.emailIsRequiredErrorText),
         EmailValidator(l.isNotAValidEmailErrorText),
