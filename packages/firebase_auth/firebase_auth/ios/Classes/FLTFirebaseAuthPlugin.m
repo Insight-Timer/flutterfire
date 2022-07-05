@@ -1348,8 +1348,12 @@ NSString *const kErrMsgInvalidCredential =
     userData[@"tenantId"] = [NSNull null];
   }
 
-  // native does not provide refresh tokens
-  userData[@"refreshToken"] = @"";
+  NSString *refreshToken = user.refreshToken;
+  if (refreshToken != nil) {
+    userData[@"refreshToken"] = refreshToken;
+  } else {
+    userData[@"refreshToken"] = [NSNull null];
+  }
   return userData;
 }
 
