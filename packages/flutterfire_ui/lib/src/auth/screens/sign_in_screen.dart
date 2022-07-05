@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutterfire_ui/auth.dart';
 
 import 'internal/login_screen.dart';
+import 'internal/multi_provider_screen.dart';
 
 /// A screen displaying a fully styled Sign In flow for Authentication.
 ///
@@ -11,31 +12,32 @@ import 'internal/login_screen.dart';
 /// {@subCategory type:screen}
 /// {@subCategory description:A screen displaying a fully styled Sign In flow for Authentication.}
 /// {@subCategory img:https://place-hold.it/400x150}
-class SignInScreen extends StatelessWidget {
-  final FirebaseAuth? auth;
-  final List<ProviderConfiguration> providerConfigs;
+class SignInScreen extends MultiProviderScreen {
   final double? headerMaxExtent;
   final HeaderBuilder? headerBuilder;
   final SideBuilder? sideBuilder;
   final OAuthButtonVariant? oauthButtonVariant;
   final TextDirection? desktopLayoutDirection;
   final String? email;
+  final bool? resizeToAvoidBottomInset;
   final bool? showAuthActionSwitch;
   final AuthViewContentBuilder? subtitleBuilder;
   final AuthViewContentBuilder? footerBuilder;
   final Key? loginViewKey;
   final List<FlutterFireUIAction> actions;
   final double breakpoint;
+  final Set<FlutterFireUIStyle>? styles;
 
   const SignInScreen({
     Key? key,
-    required this.providerConfigs,
-    this.auth,
+    List<ProviderConfiguration>? providerConfigs,
+    FirebaseAuth? auth,
     this.headerMaxExtent,
     this.headerBuilder,
     this.sideBuilder,
     this.oauthButtonVariant = OAuthButtonVariant.icon_and_text,
     this.desktopLayoutDirection,
+    this.resizeToAvoidBottomInset = false,
     this.showAuthActionSwitch,
     this.email,
     this.subtitleBuilder,
@@ -43,7 +45,8 @@ class SignInScreen extends StatelessWidget {
     this.loginViewKey,
     this.actions = const [],
     this.breakpoint = 800,
-  }) : super(key: key);
+    this.styles,
+  }) : super(key: key, providerConfigs: providerConfigs, auth: auth);
 
   Future<void> _signInWithDifferentProvider(
     BuildContext context,
@@ -58,8 +61,8 @@ class SignInScreen extends StatelessWidget {
         Navigator.of(context).pop();
       },
     );
-    final _auth = auth ?? FirebaseAuth.instance;
-    await _auth.currentUser!.linkWithCredential(state.credential!);
+
+    await auth.currentUser!.linkWithCredential(state.credential!);
   }
 
   @override
@@ -77,6 +80,7 @@ class SignInScreen extends StatelessWidget {
     return FlutterFireUIActions(
       actions: _actions,
       child: LoginScreen(
+        styles: styles,
         loginViewKey: loginViewKey,
         action: AuthAction.signIn,
         providerConfigs: providerConfigs,
@@ -87,6 +91,7 @@ class SignInScreen extends StatelessWidget {
         desktopLayoutDirection: desktopLayoutDirection,
         oauthButtonVariant: oauthButtonVariant,
         email: email,
+        resizeToAvoidBottomInset: resizeToAvoidBottomInset,
         showAuthActionSwitch: showAuthActionSwitch,
         subtitleBuilder: subtitleBuilder,
         footerBuilder: footerBuilder,

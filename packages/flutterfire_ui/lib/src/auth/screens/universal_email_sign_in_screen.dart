@@ -1,22 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
+import 'package:flutterfire_ui/src/auth/screens/internal/multi_provider_screen.dart';
 
 import '../widgets/internal/universal_page_route.dart';
 import '../widgets/internal/universal_scaffold.dart';
 
-class UniversalEmailSignInScreen extends StatelessWidget {
-  final FirebaseAuth? auth;
+class UniversalEmailSignInScreen extends MultiProviderScreen {
   final ProvidersFoundCallback? onProvidersFound;
-  final List<ProviderConfiguration>? providerConfigs;
+  final Set<FlutterFireUIStyle>? styles;
 
   const UniversalEmailSignInScreen({
     Key? key,
-    this.auth,
+    FirebaseAuth? auth,
+    List<ProviderConfiguration>? providerConfigs,
     this.onProvidersFound,
-    this.providerConfigs,
+    this.styles,
   })  : assert(onProvidersFound != null || providerConfigs != null),
-        super(key: key);
+        super(key: key, auth: auth, providerConfigs: providerConfigs);
 
   Widget _wrap(BuildContext context, Widget child) {
     return AuthStateListener(
@@ -47,7 +48,7 @@ class UniversalEmailSignInScreen extends StatelessWidget {
           context,
           RegisterScreen(
             showAuthActionSwitch: false,
-            providerConfigs: providerConfigs!,
+            providerConfigs: providerConfigs,
             auth: auth,
             email: email,
           ),
@@ -57,7 +58,7 @@ class UniversalEmailSignInScreen extends StatelessWidget {
       final List<ProviderConfiguration> finalProviders = [];
       final providersSet = Set.from(providers);
 
-      for (final p in providerConfigs!) {
+      for (final p in providerConfigs) {
         if (providersSet.contains(p.providerId)) {
           finalProviders.add(p);
         }
@@ -87,22 +88,25 @@ class UniversalEmailSignInScreen extends StatelessWidget {
           (email, providers) => _defaultAction(context, email, providers),
     );
 
-    return UniversalScaffold(
-      body: Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.biggest.width < 500) {
-              return Padding(
-                padding: const EdgeInsets.all(20),
-                child: content,
-              );
-            } else {
-              return ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: content,
-              );
-            }
-          },
+    return FlutterFireUITheme(
+      styles: styles ?? const {},
+      child: UniversalScaffold(
+        body: Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.biggest.width < 500) {
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: content,
+                );
+              } else {
+                return ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: content,
+                );
+              }
+            },
+          ),
         ),
       ),
     );
