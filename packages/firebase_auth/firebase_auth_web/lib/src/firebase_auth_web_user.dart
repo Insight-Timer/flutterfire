@@ -19,19 +19,24 @@ final DateFormat _dateFormat = DateFormat('EEE, d MMM yyyy HH:mm:ss', 'en_US');
 /// Web delegate implementation of [UserPlatform].
 class UserWeb extends UserPlatform {
   /// Creates a new [UserWeb] instance.
-  UserWeb(FirebaseAuthPlatform auth, this._webUser)
-      : super(auth, {
+  UserWeb(
+      FirebaseAuthPlatform auth, MultiFactorPlatform multiFactor, this._webUser)
+      : super(auth, multiFactor, {
           'displayName': _webUser.displayName,
           'email': _webUser.email,
           'emailVerified': _webUser.emailVerified,
           'isAnonymous': _webUser.isAnonymous,
-          'metadata': <String, int>{
-            'creationTime': _dateFormat
-                .parse(_webUser.metadata.creationTime)
-                .millisecondsSinceEpoch,
-            'lastSignInTime': _dateFormat
-                .parse(_webUser.metadata.lastSignInTime)
-                .millisecondsSinceEpoch,
+          'metadata': <String, int?>{
+            'creationTime': _webUser.metadata.creationTime != null
+                ? _dateFormat
+                    .parse(_webUser.metadata.creationTime!)
+                    .millisecondsSinceEpoch
+                : null,
+            'lastSignInTime': _webUser.metadata.lastSignInTime != null
+                ? _dateFormat
+                    .parse(_webUser.metadata.lastSignInTime!)
+                    .millisecondsSinceEpoch
+                : null,
           },
           'phoneNumber': _webUser.phoneNumber,
           'photoURL': _webUser.photoURL,
@@ -106,6 +111,15 @@ class UserWeb extends UserPlatform {
   }
 
   @override
+  Future<void> linkWithRedirect(AuthProvider provider) async {
+    try {
+      return _webUser.linkWithRedirect(convertPlatformAuthProvider(provider));
+    } catch (e) {
+      throw getFirebaseAuthException(e);
+    }
+  }
+
+  @override
   Future<ConfirmationResultPlatform> linkWithPhoneNumber(
     String phoneNumber,
     RecaptchaVerifierFactoryPlatform applicationVerifier,
@@ -131,6 +145,19 @@ class UserWeb extends UserPlatform {
     try {
       auth_interop.UserCredential userCredential = await _webUser
           .reauthenticateWithCredential(convertPlatformCredential(credential)!);
+      return UserCredentialWeb(auth, userCredential);
+    } catch (e) {
+      throw getFirebaseAuthException(e);
+    }
+  }
+
+  @override
+  Future<UserCredentialPlatform> reauthenticateWithPopup(
+      AuthProvider provider) async {
+    _assertIsSignedOut(auth);
+    try {
+      auth_interop.UserCredential userCredential = await _webUser
+          .reauthenticateWithPopup(convertPlatformAuthProvider(provider));
       return UserCredentialWeb(auth, userCredential);
     } catch (e) {
       throw getFirebaseAuthException(e);
@@ -167,7 +194,7 @@ class UserWeb extends UserPlatform {
     _assertIsSignedOut(auth);
 
     try {
-      return UserWeb(auth, await _webUser.unlink(providerId));
+      return UserWeb(auth, multiFactor, await _webUser.unlink(providerId));
     } catch (e) {
       throw getFirebaseAuthException(e);
     }

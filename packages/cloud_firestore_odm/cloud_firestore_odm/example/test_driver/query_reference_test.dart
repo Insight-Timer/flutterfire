@@ -3,37 +3,26 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore_odm_example/integration/query.dart';
 import 'package:cloud_firestore_odm_example/movie.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'common.dart';
+
 void main() {
   group('QueryReference', () {
-    late FirebaseFirestore defaultFirestore;
     late FirebaseFirestore customFirestore;
 
     setUpAll(() async {
-      defaultFirestore = FirebaseFirestore.instanceFor(
-        app: await Firebase.initializeApp(
-          options: const FirebaseOptions(
-            apiKey: 'AIzaSyAHAsf51D0A407EklG1bs-5wA7EbyfNFg0',
-            appId: '1:448618578101:ios:3a3c8ae9cb0b6408ac3efc',
-            messagingSenderId: '448618578101',
-            projectId: 'react-native-firebase-testing',
-            authDomain: 'react-native-firebase-testing.firebaseapp.com',
-            iosClientId:
-                '448618578101-m53gtqfnqipj12pts10590l37npccd2r.apps.googleusercontent.com',
-          ),
-        ),
-      );
       customFirestore = FirebaseFirestore.instanceFor(
         app: await Firebase.initializeApp(
           name: 'custom-query-app',
           options: FirebaseOptions(
-            apiKey: defaultFirestore.app.options.apiKey,
-            appId: defaultFirestore.app.options.appId,
-            messagingSenderId: defaultFirestore.app.options.messagingSenderId,
-            projectId: defaultFirestore.app.options.projectId,
+            apiKey: Firebase.app().options.apiKey,
+            appId: Firebase.app().options.appId,
+            messagingSenderId: Firebase.app().options.messagingSenderId,
+            projectId: Firebase.app().options.projectId,
           ),
         ),
       );
@@ -43,7 +32,7 @@ void main() {
       test('overrides ==', () {
         expect(
           MovieCollectionReference().limit(1),
-          MovieCollectionReference(defaultFirestore).limit(1),
+          MovieCollectionReference(FirebaseFirestore.instance).limit(1),
         );
         expect(
           MovieCollectionReference().limit(1),
@@ -65,7 +54,7 @@ void main() {
       test('overrides ==', () {
         expect(
           MovieCollectionReference().doc('123').comments.limit(1),
-          MovieCollectionReference(defaultFirestore)
+          MovieCollectionReference(FirebaseFirestore.instance)
               .doc('123')
               .comments
               .limit(1),
@@ -98,5 +87,86 @@ void main() {
         );
       });
     });
+
+    test('supports DateTimes', () async {
+      final ref = await initializeTest(dateTimeQueryRef);
+
+      await ref.add(DateTimeQuery(DateTime(1990)));
+      await ref.add(DateTimeQuery(DateTime(2000)));
+      await ref.add(DateTimeQuery(DateTime(2010)));
+
+      final snapshot = await ref.orderByTime(startAt: DateTime(2000)).get();
+
+      expect(snapshot.docs.length, 2);
+
+      expect(snapshot.docs[0].data.time, DateTime(2000));
+      expect(snapshot.docs[1].data.time, DateTime(2010));
+    });
+
+    test('supports Timestamp', () async {
+      final ref = await initializeTest(timestampQueryRef);
+
+      await ref.add(TimestampQuery(Timestamp.fromDate(DateTime(1990))));
+      await ref.add(TimestampQuery(Timestamp.fromDate(DateTime(2000))));
+      await ref.add(TimestampQuery(Timestamp.fromDate(DateTime(2010))));
+
+      final snapshot = await ref
+          .orderByTime(startAt: Timestamp.fromDate(DateTime(2000)))
+          .get();
+
+      expect(snapshot.docs.length, 2);
+
+      expect(snapshot.docs[0].data.time, Timestamp.fromDate(DateTime(2000)));
+      expect(snapshot.docs[1].data.time, Timestamp.fromDate(DateTime(2010)));
+    });
+
+    test('supports GeoPoint', () async {
+      final ref = await initializeTest(geoPointQueryRef);
+
+      await ref.add(GeoPointQuery(const GeoPoint(19, 0)));
+      await ref.add(GeoPointQuery(const GeoPoint(20, 0)));
+      await ref.add(GeoPointQuery(const GeoPoint(20, 0)));
+
+      final snapshot =
+          await ref.orderByPoint(startAt: const GeoPoint(20, 0)).get();
+
+      expect(snapshot.docs.length, 2);
+
+      expect(snapshot.docs[0].data.point, const GeoPoint(20, 0));
+      expect(snapshot.docs[1].data.point, const GeoPoint(20, 0));
+    });
+
+    test(
+      'supports DocumentReference',
+      () async {
+        final ref = await initializeTest(documentReferenceRef);
+
+        await ref.add(
+          DocumentReferenceQuery(FirebaseFirestore.instance.doc('foo/a')),
+        );
+        await ref.add(
+          DocumentReferenceQuery(FirebaseFirestore.instance.doc('foo/b')),
+        );
+        await ref.add(
+          DocumentReferenceQuery(FirebaseFirestore.instance.doc('foo/c')),
+        );
+
+        final snapshot = await ref
+            .orderByRef(startAt: FirebaseFirestore.instance.doc('foo/b'))
+            .get();
+
+        expect(snapshot.docs.length, 2);
+
+        expect(
+          snapshot.docs[0].data.ref,
+          FirebaseFirestore.instance.doc('foo/b'),
+        );
+        expect(
+          snapshot.docs[1].data.ref,
+          FirebaseFirestore.instance.doc('foo/c'),
+        );
+      },
+      skip: 'Blocked by FlutterFire support for querying document references',
+    );
   });
 }

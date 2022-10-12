@@ -13,37 +13,43 @@ import 'common.dart';
 
 void main() {
   group('DocumentReference', () {
-    late FirebaseFirestore defaultFirestore;
     late FirebaseFirestore customFirestore;
 
     setUpAll(() async {
-      defaultFirestore = FirebaseFirestore.instanceFor(
-        app: await Firebase.initializeApp(
-          options: const FirebaseOptions(
-            apiKey: 'AIzaSyAHAsf51D0A407EklG1bs-5wA7EbyfNFg0',
-            appId: '1:448618578101:ios:3a3c8ae9cb0b6408ac3efc',
-            messagingSenderId: '448618578101',
-            projectId: 'react-native-firebase-testing',
-            authDomain: 'react-native-firebase-testing.firebaseapp.com',
-            iosClientId:
-                '448618578101-m53gtqfnqipj12pts10590l37npccd2r.apps.googleusercontent.com',
-          ),
-        ),
-      );
       customFirestore = FirebaseFirestore.instanceFor(
         app: await Firebase.initializeApp(
           name: 'custom-document-app',
           options: FirebaseOptions(
-            apiKey: defaultFirestore.app.options.apiKey,
-            appId: defaultFirestore.app.options.appId,
-            messagingSenderId: defaultFirestore.app.options.messagingSenderId,
-            projectId: defaultFirestore.app.options.projectId,
+            apiKey: Firebase.app().options.apiKey,
+            appId: Firebase.app().options.appId,
+            messagingSenderId: Firebase.app().options.messagingSenderId,
+            projectId: Firebase.app().options.projectId,
           ),
         ),
       );
     });
 
     group('any document', () {
+      test('transactionDelete', () async {
+        final collection = await initializeTest(MovieCollectionReference());
+
+        await collection.doc('123').set(createMovie(title: 'title'));
+
+        expect(
+          await collection.doc('123').get().then((e) => e.exists),
+          true,
+        );
+
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          collection.doc('123').transactionDelete(transaction);
+        });
+
+        expect(
+          await collection.doc('123').get().then((e) => e.exists),
+          false,
+        );
+      });
+
       test('delete', () async {
         final collection = await initializeTest(MovieCollectionReference());
 
@@ -84,6 +90,7 @@ void main() {
           final collection = await initializeTest(MovieCollectionReference());
 
           await collection.doc('123').set(createMovie(title: 'title'));
+          await collection.doc('123').get();
 
           expect(
             await collection
@@ -98,6 +105,19 @@ void main() {
                 ),
           );
         });
+      });
+
+      test('transactionGet', () async {
+        final collection = await initializeTest(MovieCollectionReference());
+
+        await collection.doc('123').set(createMovie(title: 'title'));
+
+        final result = await FirebaseFirestore.instance.runTransaction(
+          (transaction) => collection.doc('123').transactionGet(transaction),
+        );
+
+        expect(result.id, '123');
+        expect(result.data?.title, 'title');
       });
 
       group('snapshots', () {
@@ -123,7 +143,115 @@ void main() {
         });
       });
 
+      group('transactionUpdate', () {
+        test('allows modifying a single property of an object', () async {
+          final ref = await initializeTest(moviesRef);
+
+          await ref.doc('123').set(
+                Movie(
+                  genre: [],
+                  likes: 42,
+                  poster: 'foo',
+                  rated: 'good',
+                  runtime: 'runtime',
+                  title: 'title',
+                  year: 0,
+                  id: '_',
+                ),
+              );
+
+          expect(
+            await ref.doc('123').get().then((e) => e.data),
+            isA<Movie>()
+                .having((e) => e.genre, 'genre', isEmpty)
+                .having((e) => e.likes, 'likes', 42)
+                .having((e) => e.poster, 'poster', 'foo')
+                .having((e) => e.rated, 'rated', 'good')
+                .having((e) => e.runtime, 'runtime', 'runtime')
+                .having((e) => e.title, 'title', 'title')
+                .having((e) => e.year, 'year', 0),
+          );
+
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+            ref.doc('123').transactionUpdate(transaction, genre: ['genre']);
+          });
+
+          expect(
+            await ref.doc('123').get().then((e) => e.data),
+            isA<Movie>()
+                .having((e) => e.genre, 'genre', ['genre'])
+                .having((e) => e.likes, 'likes', 42)
+                .having((e) => e.poster, 'poster', 'foo')
+                .having((e) => e.rated, 'rated', 'good')
+                .having((e) => e.runtime, 'runtime', 'runtime')
+                .having((e) => e.title, 'title', 'title')
+                .having((e) => e.year, 'year', 0),
+          );
+        });
+      });
+
+      group('transactionSet', () {
+        test('allows modifying a single property of an object', () async {
+          final ref = await initializeTest(moviesRef);
+
+          await ref.doc('123').set(createMovie(title: 'title', rated: 'good'));
+
+          expect(
+            await ref.doc('123').get().then((e) => e.data),
+            isA<Movie>()
+                .having((e) => e.rated, 'rated', 'good')
+                .having((e) => e.title, 'title', 'title'),
+          );
+
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+            ref.doc('123').transactionSet(
+                  transaction,
+                  createMovie(title: 'Foo'),
+                );
+          });
+
+          expect(
+            await ref.doc('123').get().then((e) => e.data),
+            isA<Movie>()
+                .having((e) => e.rated, 'rated', '')
+                .having((e) => e.title, 'title', 'Foo'),
+          );
+        });
+      });
+
       group('update', () {
+        test('can use FieldValue', () async {
+          final ref = await initializeTest(moviesRef);
+
+          await ref.doc('123').set(createMovie(title: 'title', likes: 10));
+
+          expect(
+            await ref.doc('123').get().then((e) => e.data),
+            isA<Movie>()
+                .having((e) => e.title, 'title', 'title')
+                .having((e) => e.likes, 'likes', 10),
+          );
+
+          await ref.doc('123').update(likesFieldValue: FieldValue.increment(1));
+
+          expect(
+            await ref.doc('123').get().then((e) => e.data),
+            isA<Movie>()
+                .having((e) => e.title, 'title', 'title')
+                .having((e) => e.likes, 'likes', 11),
+          );
+        });
+
+        test('asserts that we cannot specify both FieldValue and normal value',
+            () async {
+          expect(
+            () => moviesRef
+                .doc('123')
+                .update(likes: 10, likesFieldValue: FieldValue.increment(10)),
+            throwsAssertionError,
+          );
+        });
+
         test('allows modifying only one property of an object', () async {
           final ref = await initializeTest(moviesRef);
 
@@ -136,6 +264,7 @@ void main() {
                   runtime: 'runtime',
                   title: 'title',
                   year: 0,
+                  id: '_',
                 ),
               );
 
@@ -180,6 +309,7 @@ void main() {
                   runtime: 'runtime',
                   title: 'title',
                   year: 0,
+                  id: '_',
                 ),
               );
 
@@ -281,7 +411,7 @@ void main() {
       test('overrides ==', () {
         expect(
           MovieCollectionReference().doc('123'),
-          MovieCollectionReference(defaultFirestore).doc('123'),
+          MovieCollectionReference(FirebaseFirestore.instance).doc('123'),
         );
         expect(
           MovieCollectionReference().doc('123'),
@@ -303,7 +433,7 @@ void main() {
       test('overrides ==', () {
         expect(
           MovieCollectionReference().doc('123').comments.doc('123'),
-          MovieCollectionReference(defaultFirestore)
+          MovieCollectionReference(FirebaseFirestore.instance)
               .doc('123')
               .comments
               .doc('123'),

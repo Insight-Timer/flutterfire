@@ -24,6 +24,15 @@ public class FlutterFirebaseAuthPluginException extends Exception {
     this.message = message;
   }
 
+  FlutterFirebaseAuthPluginException(
+      @NonNull String code, @NonNull String message, @NonNull Map<String, Object> additionalData) {
+    super(message, null);
+
+    this.code = code;
+    this.message = message;
+    this.additionalData = additionalData;
+  }
+
   FlutterFirebaseAuthPluginException(@NonNull Exception nativeException, Throwable cause) {
     super(nativeException.getMessage(), cause);
 
@@ -73,6 +82,11 @@ public class FlutterFirebaseAuthPluginException extends Exception {
   static FlutterFirebaseAuthPluginException noSuchProvider() {
     return new FlutterFirebaseAuthPluginException(
         "NO_SUCH_PROVIDER", "User was not linked to an account with the given provider.");
+  }
+
+  static FlutterFirebaseAuthPluginException alreadyLinkedProvider() {
+    return new FlutterFirebaseAuthPluginException(
+        "PROVIDER_ALREADY_LINKED", "User has already been linked to the given provider.");
   }
 
   public String getCode() {
