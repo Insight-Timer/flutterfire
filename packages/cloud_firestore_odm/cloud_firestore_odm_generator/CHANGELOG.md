@@ -1,3 +1,63 @@
+## 1.0.0-dev.33
+
+ - **FIX**: Update ignored lints in generated files ([#9683](https://github.com/firebase/flutterfire/issues/9683)). ([3ab283bb](https://github.com/firebase/flutterfire/commit/3ab283bb3ec6e5dbc0befefb062c5069959f9fb5))
+ - **FEAT**: Add transaction utilities to the ODM ([#9670](https://github.com/firebase/flutterfire/issues/9670)). ([7d84d70a](https://github.com/firebase/flutterfire/commit/7d84d70a1120f7751f5ff817d7b10b330dcf7e06))
+
+## 1.0.0-dev.32
+
+ - **FEAT**: Allow injecting the document ID in the ODM model ([#9600](https://github.com/firebase/flutterfire/issues/9600)). ([c7e93cfe](https://github.com/firebase/flutterfire/commit/c7e93cfec14e0e00bcabb232760ae5a968a1c2a1))
+
+## 1.0.0-dev.31
+
+ - **FIX**: a false positive by checking that there are no prefix duplicates.  ([#9576](https://github.com/firebase/flutterfire/issues/9576)). ([d6f619c9](https://github.com/firebase/flutterfire/commit/d6f619c90fadb5057a8db1d69921cd4e2f5c1816))
+ - **FIX**: handle query.orderBy(startAt:).orderBy() ([#9185](https://github.com/firebase/flutterfire/issues/9185)). ([62396e8a](https://github.com/firebase/flutterfire/commit/62396e8a4a229dfc096d6280964bb559c00b3511))
+
+## 1.0.0-dev.30
+
+ - **FEAT**: add support for specifying class name prefix ([#9453](https://github.com/firebase/flutterfire/issues/9453)). ([49921a43](https://github.com/firebase/flutterfire/commit/49921a4362c5965d2efeed17eb73775302007ea8))
+
+## 1.0.0-dev.29
+
+ - **FIX**: bump minimum analyzer version ([#9493](https://github.com/firebase/flutterfire/issues/9493)). ([5137a646](https://github.com/firebase/flutterfire/commit/5137a6469fb57fb003757459222cb6c4e39fb0f8))
+ - **FEAT**: Add support using Freezed classes as collection models ([#9483](https://github.com/firebase/flutterfire/issues/9483)). ([ce238f71](https://github.com/firebase/flutterfire/commit/ce238f713b250f523890b9e7e42d395f433ed80f))
+
+## 1.0.0-dev.28
+
+ - Update a dependency to the latest release.
+
+## 1.0.0-dev.27
+
+ - **FIX**: replace deprecated elements from analyzer ([#9366](https://github.com/firebase/flutterfire/issues/9366)). ([89c4c429](https://github.com/firebase/flutterfire/commit/89c4c4294dc6fb376caf74704abf738ec664f85f))
+
+## 1.0.0-dev.26
+
+ - Update a dependency to the latest release.
+
+## 1.0.0-dev.25
+
+ - Update a dependency to the latest release.
+
+## 1.0.0-dev.24
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: Add where(arrayContains) support ([#9167](https://github.com/firebase/flutterfire/issues/9167)). ([1a2f2262](https://github.com/firebase/flutterfire/commit/1a2f2262578c6230560761630d017637b99cbd6c))
+ - **BREAKING** **FEAT**: The low-level interface of Queries/Document ([#9184](https://github.com/firebase/flutterfire/issues/9184)). ([fad4b0cd](https://github.com/firebase/flutterfire/commit/fad4b0cd0aa09e9161c64deeecf222c14603cd69))
+
+## 1.0.0-dev.23
+
+ - Update a dependency to the latest release.
+
+## 1.0.0-dev.22
+
+ - Update a dependency to the latest release.
+
+## 1.0.0-dev.21
+
+ - **FEAT**: add orderByFieldPath / whereFieldPath ([#8951](https://github.com/firebase/flutterfire/issues/8951)). ([5957c23b](https://github.com/firebase/flutterfire/commit/5957c23b44b235dab9d97449acb9c737da07b8e7))
+ - **FEAT**: Add support for DateTime/Timestamp/GeoPoint ([#8563](https://github.com/firebase/flutterfire/issues/8563)). ([f2ea3696](https://github.com/firebase/flutterfire/commit/f2ea36964662d396dbc26bd931bb2662a5898168))
+ - **FEAT**: add support for json_serializable's field rename/property ignore ([#9030](https://github.com/firebase/flutterfire/issues/9030)). ([81ec08fd](https://github.com/firebase/flutterfire/commit/81ec08fd64d57b4fbdc8e4fca39b5ab84dcc8669))
+
 ## 1.0.0-dev.20
 
  - Update a dependency to the latest release.

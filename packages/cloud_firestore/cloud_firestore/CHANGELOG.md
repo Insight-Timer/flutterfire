@@ -1,3 +1,57 @@
+## 3.5.1
+
+ - **FIX**: fix a query error in Flutter Web that was affecting the parsing of ancient dates ([#9633](https://github.com/firebase/flutterfire/issues/9633)). ([9250d45f](https://github.com/firebase/flutterfire/commit/9250d45f1d7ece9335b2c4c4795fecc728df3de5))
+
+## 3.5.0
+
+ - **FEAT**: add OAuth Access Token support to sign in with providers ([#9593](https://github.com/firebase/flutterfire/issues/9593)). ([cb6661bb](https://github.com/firebase/flutterfire/commit/cb6661bbc701031d6f920ace3a6efc8e8d56aa4c))
+ - **FEAT**: Bump Firebase iOS SDK to `9.6.0` ([#9531](https://github.com/firebase/flutterfire/issues/9531)). ([2138f4aa](https://github.com/firebase/flutterfire/commit/2138f4aaaace51d5dce4809fb42e1e4ff20ed251))
+
+## 3.4.9
+
+ - Update a dependency to the latest release.
+
+## 3.4.8
+
+ - **FIX**: fix `queryGet()` & `namedQueryGet()`. Check if `query` is `[NSNull null]` value ([#9410](https://github.com/firebase/flutterfire/issues/9410)). ([ae035fe2](https://github.com/firebase/flutterfire/commit/ae035fe2b060264153386ae5c2a1eb90c22e90f3))
+
+## 3.4.7
+
+ - Update a dependency to the latest release.
+
+## 3.4.6
+
+ - Update a dependency to the latest release.
+
+## 3.4.5
+
+ - Update a dependency to the latest release.
+
+## 3.4.4
+
+ - **FIX**: stop `FirebaseError` appearing in console on hot restart & hot refresh ([#9321](https://github.com/firebase/flutterfire/issues/9321)). ([4ba0ff9d](https://github.com/firebase/flutterfire/commit/4ba0ff9d9c7d13f7e040d80375d6db3edb8d37d5))
+
+## 3.4.3
+
+ - Update a dependency to the latest release.
+
+## 3.4.2
+
+ - Update a dependency to the latest release.
+
+## 3.4.1
+
+ - Update a dependency to the latest release.
+
+## 3.4.0
+
+ - **FEAT**: add max attempts for Firestore transactions ([#9163](https://github.com/firebase/flutterfire/issues/9163)). ([9da7cc36](https://github.com/firebase/flutterfire/commit/9da7cc36cb266e4f5a0de26dfe727e0a4687f1a0))
+ - **FEAT**: update to 9.3.0 ([#9137](https://github.com/firebase/flutterfire/issues/9137)). ([97f6417b](https://github.com/firebase/flutterfire/commit/97f6417bf66f88e6621afa177c73245b9a7d5c73))
+
+## 3.3.0
+
+ - **FEAT**: upgrade to support v9.8.1 Firebase JS SDK ([#8235](https://github.com/firebase/flutterfire/issues/8235)). ([4b417af5](https://github.com/firebase/flutterfire/commit/4b417af574bb8a32ca8e4b3ab2ff253a22be9903))
+
 ## 3.2.1
 
  - **FIX**: bump `firebase_core_platform_interface` version to fix previous release. ([bea70ea5](https://github.com/firebase/flutterfire/commit/bea70ea5cbbb62cbfd2a7a74ae3a07cb12b3ee5a))

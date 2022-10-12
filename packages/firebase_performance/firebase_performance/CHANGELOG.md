@@ -1,3 +1,39 @@
+## 0.8.3+3
+
+ - Update a dependency to the latest release.
+
+## 0.8.3+2
+
+ - Update a dependency to the latest release.
+
+## 0.8.3+1
+
+ - Update a dependency to the latest release.
+
+## 0.8.3
+
+ - **FEAT**: Bump Firebase iOS SDK to 9.5.0 ([#9492](https://github.com/firebase/flutterfire/issues/9492)). ([d246ba2a](https://github.com/firebase/flutterfire/commit/d246ba2aeec3da0bf5e2b4171ea2d1ec67618226))
+
+## 0.8.2+4
+
+ - Update a dependency to the latest release.
+
+## 0.8.2+3
+
+ - Update a dependency to the latest release.
+
+## 0.8.2+2
+
+ - Update a dependency to the latest release.
+
+## 0.8.2+1
+
+ - Update a dependency to the latest release.
+
+## 0.8.2
+
+ - **FEAT**: upgrade to support v9.8.1 Firebase JS SDK ([#8235](https://github.com/firebase/flutterfire/issues/8235)). ([4b417af5](https://github.com/firebase/flutterfire/commit/4b417af574bb8a32ca8e4b3ab2ff253a22be9903))
+
 ## 0.8.1+1
 
  - **FIX**: bump `firebase_core_platform_interface` version to fix previous release. ([bea70ea5](https://github.com/firebase/flutterfire/commit/bea70ea5cbbb62cbfd2a7a74ae3a07cb12b3ee5a))

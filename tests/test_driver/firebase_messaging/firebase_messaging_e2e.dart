@@ -4,11 +4,11 @@
 
 import 'dart:async';
 
+import 'package:drive/drive.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
-import 'package:drive/drive.dart';
 import 'package:flutter/foundation.dart';
+
 import '../firebase_default_options.dart';
 
 // ignore: do_not_use_environment
@@ -75,8 +75,10 @@ void setupTests() {
       });
 
       group('isSupported()', () {
-        test('returns "true" value', () {
-          expect(messaging.isSupported(), isTrue);
+        test('returns "true" value', () async {
+          final result = await messaging.isSupported();
+
+          expect(result, isA<bool>());
         });
       });
 
@@ -97,6 +99,7 @@ void setupTests() {
           'authorizationStatus returns AuthorizationStatus.notDetermined on Web',
           () async {
             final result = await messaging.requestPermission();
+
             expect(result, isA<NotificationSettings>());
             expect(
               result.authorizationStatus,
@@ -136,8 +139,21 @@ void setupTests() {
         'getToken()',
         () {
           test('returns a token', () async {
-            final result = await messaging.getToken();
-            expect(result, isA<String>());
+            final result = await messaging.requestPermission();
+
+            if (result.authorizationStatus == AuthorizationStatus.authorized) {
+              final result = await messaging.getToken();
+
+              expect(result, isA<String>());
+            } else {
+              await expectLater(
+                messaging.getToken(),
+                throwsA(
+                  isA<FirebaseException>()
+                      .having((e) => e.code, 'code', 'permission-blocked'),
+                ),
+              );
+            }
           });
         },
         skip: skipManualTests,
@@ -147,14 +163,26 @@ void setupTests() {
         test(
           'generate a new token after deleting',
           () async {
-            final token1 = await messaging.getToken();
-            await Future.delayed(const Duration(seconds: 3));
-            await messaging.deleteToken();
-            await Future.delayed(const Duration(seconds: 3));
-            final token2 = await messaging.getToken();
-            expect(token1, isA<String>());
-            expect(token2, isA<String>());
-            expect(token1, isNot(token2));
+            final result = await messaging.requestPermission();
+
+            if (result.authorizationStatus == AuthorizationStatus.authorized) {
+              final token1 = await messaging.getToken();
+              await Future.delayed(const Duration(seconds: 3));
+              await messaging.deleteToken();
+              await Future.delayed(const Duration(seconds: 3));
+              final token2 = await messaging.getToken();
+              expect(token1, isA<String>());
+              expect(token2, isA<String>());
+              expect(token1, isNot(token2));
+            } else {
+              await expectLater(
+                messaging.getToken(),
+                throwsA(
+                  isA<FirebaseException>()
+                      .having((e) => e.code, 'code', 'permission-blocked'),
+                ),
+              );
+            }
           },
           skip: skipManualTests,
         ); // only run for manual testing
@@ -167,7 +195,8 @@ void setupTests() {
             const topic = 'test-topic';
             await messaging.subscribeToTopic(topic);
           },
-          skip: kIsWeb,
+          // macOS skipped because it needs keychain sharing entitlement. See: https://github.com/firebase/flutterfire/issues/9538
+          skip: kIsWeb || defaultTargetPlatform == TargetPlatform.macOS,
         );
       });
 
@@ -178,6 +207,18 @@ void setupTests() {
             const topic = 'test-topic';
             await messaging.unsubscribeFromTopic(topic);
           },
+          // macOS skipped because it needs keychain sharing entitlement. See: https://github.com/firebase/flutterfire/issues/9538
+          skip: kIsWeb || defaultTargetPlatform == TargetPlatform.macOS,
+        );
+      });
+
+      group('setDeliveryMetricsExportToBigQuery()', () {
+        test(
+          'successfully set delivery metrics export to big query',
+          () async {
+            await messaging.setDeliveryMetricsExportToBigQuery(true);
+          },
+          // Web is skipped because it has to be setup in the service worker
           skip: kIsWeb,
         );
       });

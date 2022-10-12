@@ -1,3 +1,39 @@
+## 0.2.3+15
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+14
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+13
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+12
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+11
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+10
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+9
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+8
+
+ - Update a dependency to the latest release.
+
+## 0.2.3+7
+
+ - Update a dependency to the latest release.
+
 ## 0.2.3+6
 
  - **FIX**: bump `firebase_core_platform_interface` version to fix previous release. ([bea70ea5](https://github.com/firebase/flutterfire/commit/bea70ea5cbbb62cbfd2a7a74ae3a07cb12b3ee5a))

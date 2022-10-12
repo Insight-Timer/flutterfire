@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore_odm_example/integration.dart';
 import 'package:cloud_firestore_odm_example/movie.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,6 +33,33 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('Injects document ID when annotated by @Id', () async {
+      final collection = await initializeTest(MovieCollectionReference());
+
+      await collection.doc('123').set(createMovie(title: 'a'));
+      await collection.doc('456').set(createMovie(title: 'b'));
+
+      final a = await collection.doc('123').get();
+      final b = await collection.doc('456').get();
+
+      expect(a.data?.id, '123');
+      expect(b.data?.id, '456');
+    });
+
+    test(
+        'When using @Id, set/update do not insert an "id" property in the document',
+        () async {
+      final collection = await initializeTest(MovieCollectionReference());
+
+      await collection.doc('123').set(createMovie(title: 'a', id: '42'));
+
+      final snapshot = await FirebaseFirestore.instance
+          .doc(collection.doc('123').path)
+          .get();
+
+      expect(snapshot.data()?.containsKey('id'), false);
     });
 
     group('any collection', () {
@@ -328,6 +356,100 @@ void main() {
         });
       });
 
+      test('orderByFieldPath', () async {
+        final collection = await initializeTest(MovieCollectionReference());
+
+        await collection.add(createMovie(title: 'A', rated: '10'));
+        await collection.add(createMovie(title: 'B', rated: '1'));
+        await collection.add(createMovie(title: 'C', rated: '5'));
+
+        final querySnap = await collection
+            .orderByFieldPath(
+              FieldPath.fromString('title'),
+              startAt: 'B',
+            )
+            .get();
+
+        expect(
+          querySnap.docs.map((e) => e.data.title),
+          ['B', 'C'],
+        );
+      });
+
+      group('arrayContains', () {
+        test('supports whereFieldPath', () async {
+          final collection = await initializeTest(MovieCollectionReference());
+
+          await collection.add(
+            createMovie(title: 'A', genre: ['foo', 'unrelated']),
+          );
+          await collection.add(
+            createMovie(title: 'B', genre: ['bar', 'unrelated']),
+          );
+          await collection.add(
+            createMovie(title: 'C', genre: ['bar', 'unrelated']),
+          );
+
+          final querySnap = await collection
+              .whereFieldPath(
+                FieldPath.fromString('genre'),
+                arrayContains: 'bar',
+              )
+              .orderByTitle()
+              .get();
+
+          expect(
+            querySnap.docs.map((e) => e.data.title),
+            ['B', 'C'],
+          );
+        });
+
+        test('supports whereProperty', () async {
+          final collection = await initializeTest(MovieCollectionReference());
+
+          await collection.add(
+            createMovie(title: 'A', genre: ['foo', 'unrelated']),
+          );
+          await collection.add(
+            createMovie(title: 'B', genre: ['bar', 'unrelated']),
+          );
+          await collection.add(
+            createMovie(title: 'C', genre: ['bar', 'unrelated']),
+          );
+
+          final querySnap = await collection
+              .whereGenre(arrayContains: 'bar')
+              .orderByTitle()
+              .get();
+
+          expect(
+            querySnap.docs.map((e) => e.data.title),
+            ['B', 'C'],
+          );
+        });
+      });
+
+      test('whereFieldPath', () async {
+        final collection = await initializeTest(MovieCollectionReference());
+
+        await collection.add(createMovie(title: 'A', rated: '4'));
+        await collection.add(createMovie(title: 'B', rated: '5'));
+        await collection.add(createMovie(title: 'C', rated: '5'));
+
+        final querySnap = await collection
+            .whereFieldPath(
+              FieldPath.fromString('rated'),
+              isEqualTo: '5',
+            )
+            .orderByTitle()
+            .get();
+
+        expect(
+          querySnap.docs.map((e) => e.data.title),
+          ['B', 'C'],
+        );
+      });
+
       group('documentId', () {
         test('orderByDocumentId', () async {
           final collection = await initializeTest(MovieCollectionReference());
@@ -367,26 +489,159 @@ void main() {
         });
       });
 
-      group('startAt', () {
-        test('supports values', () async {
-          final collection = await initializeTest(MovieCollectionReference());
+      group('where', () {
+        test('supports field renaming', () async {
+          final collection =
+              await initializeTest(AdvancedJsonCollectionReference());
 
-          await collection.add(createMovie(title: 'A'));
-          await collection.add(createMovie(title: 'B'));
-          await collection.add(createMovie(title: 'C'));
-
-          final querySnap = await collection.orderByTitle(startAt: 'B').get();
+          await collection
+              .add(AdvancedJson(firstName: 'John', lastName: 'Doe'));
+          await collection
+              .add(AdvancedJson(firstName: 'John', lastName: 'Smith'));
+          await collection
+              .add(AdvancedJson(firstName: 'Mike', lastName: 'Doe'));
 
           expect(
-            querySnap.docs,
+            await collection.reference
+                .orderBy('first_name')
+                .orderBy('LAST_NAME')
+                .get()
+                .then((value) => value.docs.map((e) => e.data().toJson())),
             [
-              isA<MovieQueryDocumentSnapshot>()
-                  .having((d) => d.data.title, 'data.title', 'B'),
-              isA<MovieQueryDocumentSnapshot>()
-                  .having((d) => d.data.title, 'data.title', 'C'),
+              {'first_name': 'John', 'LAST_NAME': 'Doe'},
+              {'first_name': 'John', 'LAST_NAME': 'Smith'},
+              {'first_name': 'Mike', 'LAST_NAME': 'Doe'},
+            ],
+          );
+
+          expect(
+            await collection
+                .whereFirstName(isEqualTo: 'John')
+                .orderByLastName()
+                .get()
+                .then((value) => value.docs.map((e) => e.data)),
+            [
+              AdvancedJson(firstName: 'John', lastName: 'Doe'),
+              AdvancedJson(firstName: 'John', lastName: 'Smith'),
+            ],
+          );
+          expect(
+            await collection
+                .whereLastName(isEqualTo: 'Doe')
+                .orderByFirstName()
+                .get()
+                .then((value) => value.docs.map((e) => e.data)),
+            [
+              AdvancedJson(firstName: 'John', lastName: 'Doe'),
+              AdvancedJson(firstName: 'Mike', lastName: 'Doe'),
             ],
           );
         });
+      });
+
+      group('orderBy', () {
+        test('supports field renaming', () async {
+          final collection =
+              await initializeTest(AdvancedJsonCollectionReference());
+
+          await collection.add(AdvancedJson(firstName: 'A', lastName: 'A'));
+          await collection
+              .add(AdvancedJson(firstName: 'John', lastName: 'Doe'));
+          await collection
+              .add(AdvancedJson(firstName: 'John', lastName: 'Smith'));
+          await collection
+              .add(AdvancedJson(firstName: 'Mike', lastName: 'Doe'));
+
+          expect(
+            await collection.reference
+                .orderBy('first_name')
+                .orderBy('LAST_NAME')
+                .get()
+                .then((value) => value.docs.map((e) => e.data().toJson())),
+            [
+              {'first_name': 'A', 'LAST_NAME': 'A'},
+              {'first_name': 'John', 'LAST_NAME': 'Doe'},
+              {'first_name': 'John', 'LAST_NAME': 'Smith'},
+              {'first_name': 'Mike', 'LAST_NAME': 'Doe'},
+            ],
+          );
+
+          expect(
+            await collection
+                .orderByFirstName(startAt: 'B')
+                .get()
+                .then((value) => value.docs.map((e) => e.data.firstName)),
+            ['John', 'John', 'Mike'],
+          );
+          expect(
+            await collection
+                .orderByLastName(startAt: 'B')
+                .get()
+                .then((value) => value.docs.map((e) => e.data.lastName)),
+            ['Doe', 'Doe', 'Smith'],
+          );
+        });
+      });
+
+      group('startAt', () {
+        test(
+          'supports values',
+          () async {
+            final collection = await initializeTest(MovieCollectionReference());
+
+            await collection.add(createMovie(title: 'A'));
+            await collection.add(createMovie(title: 'B'));
+            await collection.add(createMovie(title: 'C'));
+
+            final querySnap = await collection.orderByTitle(startAt: 'B').get();
+
+            expect(
+              querySnap.docs,
+              [
+                isA<MovieQueryDocumentSnapshot>()
+                    .having((d) => d.data.title, 'data.title', 'B'),
+                isA<MovieQueryDocumentSnapshot>()
+                    .having((d) => d.data.title, 'data.title', 'C'),
+              ],
+            );
+          },
+          timeout: const Timeout.factor(5),
+        );
+
+        test(
+          'can be used multiple times within a query',
+          () async {
+            final collection = await initializeTest(MovieCollectionReference());
+
+            await collection.add(createMovie(title: 'A', likes: 1));
+            await collection.add(createMovie(title: 'A', likes: 2));
+            await collection.add(createMovie(title: 'B', likes: 1));
+            await collection.add(createMovie(title: 'B', likes: 2));
+            await collection.add(createMovie(title: 'C', likes: 1));
+            await collection.add(createMovie(title: 'C', likes: 2));
+
+            final querySnap = await collection
+                .orderByTitle(startAt: 'B')
+                .orderByLikes(startAt: 2)
+                .get();
+
+            expect(
+              querySnap.docs,
+              [
+                isA<MovieQueryDocumentSnapshot>()
+                    .having((d) => d.data.title, 'data.title', 'B')
+                    .having((d) => d.data.likes, 'data.likes', 2),
+                isA<MovieQueryDocumentSnapshot>()
+                    .having((d) => d.data.title, 'data.title', 'C')
+                    .having((d) => d.data.likes, 'data.likes', 1),
+                isA<MovieQueryDocumentSnapshot>()
+                    .having((d) => d.data.title, 'data.title', 'C')
+                    .having((d) => d.data.likes, 'data.likes', 2),
+              ],
+            );
+          },
+          timeout: const Timeout.factor(5),
+        );
 
         test('supports document snapshots', () async {
           final collection = await initializeTest(MovieCollectionReference());
@@ -511,6 +766,7 @@ void main() {
             runtime: 'runtime',
             title: 'title',
             year: 1999,
+            id: '_',
           ),
         );
         final snapshot = StreamQueue(doc.snapshots());
@@ -534,6 +790,7 @@ void main() {
             runtime: 'runtime2',
             title: 'title2',
             year: 14242,
+            id: '_',
           ),
         );
 
@@ -567,6 +824,7 @@ void main() {
             runtime: 'runtime',
             title: 'title',
             year: 1999,
+            id: '_',
           ),
         );
 
@@ -589,6 +847,7 @@ void main() {
             runtime: 'runtime2',
             title: 'title2',
             year: 14242,
+            id: '_',
           ),
         );
 

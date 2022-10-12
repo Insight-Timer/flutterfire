@@ -9,7 +9,8 @@ import 'package:cloud_firestore_odm_example/movie.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mockito/mockito.dart';
 
-Future<T> initializeTest<T extends FirestoreCollectionReference<Object?>>(
+Future<T>
+    initializeTest<T extends FirestoreCollectionReference<Object?, Object?>>(
   T ref,
 ) async {
   final snapshot = await ref.reference.get();
@@ -29,6 +30,7 @@ Movie createMovie({
   String runtime = '',
   String title = '',
   int year = 1990,
+  String id = '',
 }) {
   return Movie(
     genre: genre,
@@ -38,6 +40,7 @@ Movie createMovie({
     runtime: runtime,
     title: title,
     year: year,
+    id: id,
   );
 }
 

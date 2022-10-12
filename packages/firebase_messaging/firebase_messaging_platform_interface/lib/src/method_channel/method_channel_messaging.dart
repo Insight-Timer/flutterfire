@@ -144,8 +144,8 @@ class MethodChannelFirebaseMessaging extends FirebaseMessagingPlatform {
 
   /// Returns "true" as this API is used to inform users of web browser support
   @override
-  bool isSupported() {
-    return true;
+  Future<bool> isSupported() {
+    return Future.value(true);
   }
 
   @override
@@ -379,6 +379,23 @@ class MethodChannelFirebaseMessaging extends FirebaseMessagingPlatform {
       await channel.invokeMapMethod('Messaging#unsubscribeFromTopic', {
         'appName': app.name,
         'topic': topic,
+      });
+    } catch (e, stack) {
+      convertPlatformException(e, stack);
+    }
+  }
+
+  @override
+  Future<void> setDeliveryMetricsExportToBigQuery(bool enabled) async {
+    // The method is not available on iOS.
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    }
+    try {
+      await channel
+          .invokeMapMethod('Messaging#setDeliveryMetricsExportToBigQuery', {
+        'appName': app.name,
+        'enabled': enabled,
       });
     } catch (e, stack) {
       convertPlatformException(e, stack);

@@ -9,8 +9,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../firebase_default_options.dart';
 import './test_utils.dart';
+import '../firebase_default_options.dart';
 
 void setupTests() {
   group('FirebaseAuth.instance', () {
@@ -190,8 +190,6 @@ void setupTests() {
 
         await FirebaseAuth.instance.currentUser!
             .updateDisplayName('updatedName');
-
-        await FirebaseAuth.instance.currentUser!.reload();
 
         expect(
           FirebaseAuth.instance.currentUser!.displayName,
