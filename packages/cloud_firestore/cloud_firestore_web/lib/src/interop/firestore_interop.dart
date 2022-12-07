@@ -34,6 +34,10 @@ external PromiseJsImpl<void> clearIndexedDbPersistence(
 );
 
 @JS()
+external PromiseJsImpl<void> setIndexConfiguration(
+    FirestoreJsImpl firestore, String indexConfiguration);
+
+@JS()
 external CollectionReferenceJsImpl collection(
   FirestoreJsImpl firestore,
   String collectionPath,
@@ -651,3 +655,13 @@ external Object get arrayRemove;
 
 @JS()
 external Object get arrayUnion;
+
+@JS()
+external PromiseJsImpl<AggregateQuerySnapshotJsImpl> getCountFromServer(
+  QueryJsImpl query,
+);
+
+@JS('AggregateQuerySnapshot')
+abstract class AggregateQuerySnapshotJsImpl {
+  external Map<String, Object> data();
+}
