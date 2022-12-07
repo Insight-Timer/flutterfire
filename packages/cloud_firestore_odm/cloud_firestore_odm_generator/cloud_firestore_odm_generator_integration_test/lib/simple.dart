@@ -16,6 +16,7 @@ class Model {
 class Nested {
   Nested({
     required this.value,
+    required this.simple,
     required this.valueList,
     required this.boolList,
     required this.stringList,
@@ -29,6 +30,7 @@ class Nested {
   Map<String, Object?> toJson() => _$NestedToJson(this);
 
   final Nested? value;
+  final int? simple;
   final List<Nested>? valueList;
   final List<bool>? boolList;
   final List<String>? stringList;
@@ -145,10 +147,26 @@ class AsCamelCase {
   Map<String, Object?> toJson() => _$AsCamelCaseToJson(this);
 }
 
+@JsonSerializable()
+class CustomClassPrefix {
+  CustomClassPrefix(this.value);
+
+  factory CustomClassPrefix.fromJson(Map<String, Object?> json) =>
+      _$CustomClassPrefixFromJson(json);
+
+  final num value;
+
+  Map<String, Object?> toJson() => _$CustomClassPrefixToJson(this);
+}
+
 @Collection<Root>('root')
 @Collection<Sub>('root/*/sub')
 @Collection<AsCamelCase>('root/*/as-camel-case')
 @Collection<CustomSubName>('root/*/custom-sub-name', name: 'thisIsACustomName')
+@Collection<CustomClassPrefix>(
+  'root/*/custom-class-prefix',
+  prefix: 'ThisIsACustomPrefix',
+)
 final rootRef = RootCollectionReference();
 
 @JsonSerializable()

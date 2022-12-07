@@ -1,3 +1,39 @@
+## 0.1.1+10
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+9
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+8
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+7
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+6
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+5
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+4
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+3
+
+ - Update a dependency to the latest release.
+
+## 0.1.1+2
+
+ - Update a dependency to the latest release.
+
 ## 0.1.1+1
 
  - **FIX**: bump `firebase_core_platform_interface` version to fix previous release. ([bea70ea5](https://github.com/firebase/flutterfire/commit/bea70ea5cbbb62cbfd2a7a74ae3a07cb12b3ee5a))
@@ -53,7 +89,6 @@
 
 ## 0.1.0+5
 
- - **FIX**: bump Android `compileSdkVersion` to 31 (#7726). ([a9562bac](https://github.com/firebase/flutterfire/commit/a9562bac60ba927fb3664a47a7f7eaceb277dca6))
 
 ## 0.1.0+4
 

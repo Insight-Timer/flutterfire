@@ -1,5 +1,6 @@
-Project: /docs/_project.yaml
+Project: /docs/database/_project.yaml
 Book: /docs/_book.yaml
+page_type: guide
 
 <link rel="stylesheet" type="text/css" href="/styles/docs.css" />
 
@@ -185,8 +186,7 @@ top posts sorted by their star count:
 final myUserId = FirebaseAuth.instance.currentUser?.uid;
 final topUserPostsRef = FirebaseDatabase.instance
     .ref("user-posts/$myUserId")
-    .orderByChild("starCount")
-    .ref;
+    .orderByChild("starCount");
 ```
 
 This defines a query that when combined with a [child listener](#child-events)

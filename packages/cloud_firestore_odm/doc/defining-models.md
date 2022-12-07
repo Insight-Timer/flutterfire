@@ -1,3 +1,12 @@
+- [Defining Models](#defining-models)
+  - [Creating references](#creating-references)
+  - [Injecting the document ID in the model](#injecting-the-document-id-in-the-model)
+  - [Model validation](#model-validation)
+    - [Available validators](#available-validators)
+      - [`int`](#int)
+    - [Custom validators](#custom-validators)
+  - [Next Steps](#next-steps)
+
 # Defining Models
 
 > The Cloud Firestore ODM is currently in **alpha**. Expect breaking changes, API changes and more. The documentation is still a work in progress. See the [discussion](https://github.com/firebase/flutterfire/discussions/7475) for more details.
@@ -17,7 +26,17 @@ import 'package:cloud_firestore_odm/cloud_firestore_odm.dart';
 // This doesn't exist yet...! See "Next Steps"
 part 'user.g.dart';
 
-@JsonSerializable(explicitToJson: true)
+/// A custom JsonSerializable annotation that supports decoding objects such
+/// as Timestamps and DateTimes.
+/// This variable can be reused between different models
+const firestoreSerializable = JsonSerializable(
+  converters: firestoreJsonConverters,
+  // The following values could alternatively be set inside your `build.yaml`
+  explicitToJson: true,
+  createFieldMap: true,
+);
+
+@firestoreSerializable
 class User {
   User({
     required this.name,
@@ -33,11 +52,12 @@ class User {
 
 The `User` model defines that a user must have a name and email as a `String` and age as an `int`.
 
+:::caution
 If your model class is defined in a separate file than the Firestore reference,
 you will need to explicitly specify `fromJson`/`toJson` functions as followed:
 
 ```dart
-@JsonSerializable(explicitToJson: true)
+@firestoreSerializable
 class User {
   User({
     required this.name,
@@ -55,7 +75,63 @@ class User {
 }
 ```
 
+:::
+
 **Note**: `JsonSerializable(fieldRename: ...)` and `JsonKey(ignore: true)` are currently not supported
+
+## Creating references
+
+On their own, a model does not do anything. Instead we create a "reference" using a model.
+A reference enables the ODM to interact with Firestore using the model.
+
+To create a reference, we use the `Collection` annotation which is used as a pointer to a collection
+within the Firestore database. For example, the `users` collection in the root of the database
+corresponds to the `Users` model we defined previously:
+
+```dart
+@firestoreSerializable
+class User {
+ // ...
+}
+
+@Collection<User>('users')
+final usersRef = UserCollectionReference();
+```
+
+If you are looking to define a model as a reference on a Subcollection, read the [Working with Subcollections](./subcollections.md) documentation.
+
+## Injecting the document ID in the model
+
+By default, the document ID is not present in the firestore object once decoded.
+
+While you can acccess it using the `DocumentSnapshot`, it isn't always convenient.
+A solution to that is to use the `@Id` annotation, to tell Firestore that a
+a given property in a class would be the document ID:
+
+```dart
+@Collection<Person>('users')
+@firestoreSerializable
+class Person {
+  Person({
+    required this.name,
+    required this.age,
+    required this.id,
+  });
+
+  // By adding this annotation, this property will not be considered as part
+  // of the Firestore document, but instead represent the document ID.
+  @Id()
+  final String id;
+
+  final String name;
+  final int age;
+}
+```
+
+There are a few restrictions when using this annotation:
+
+- It can be used only once within an object
+- The annotated property must be of type `String`.
 
 ## Model validation
 
@@ -68,7 +144,7 @@ The ODM provides some basic annotation validators which can be used on model pro
 example, we can take advantage of the `Min` validator:
 
 ```dart
-@JsonSerializable(explicitToJson: true)
+@firestoreSerializable
 class User {
   User({
     required this.name,
@@ -102,7 +178,7 @@ method. Note the name of this class is generated based on the model name (for ex
 The following annotations are available for `int` properties:
 
 | Annotation | Description                                        |
-|------------|----------------------------------------------------|
+| ---------- | -------------------------------------------------- |
 | `Min`      | Validates a number is not less than this value.    |
 | `Max`      | Validates a number is not greater than this value. |
 
@@ -129,7 +205,7 @@ class EmailAddressValidator implements Validator<String> {
 Within the model, you can then apply the validator to the property:
 
 ```dart
-@JsonSerializable(explicitToJson: true)
+@firestoreSerializable
 class User {
   User({
     required this.name,
@@ -147,27 +223,6 @@ class User {
   final String email;
 }
 ```
-
-## Creating references
-
-On their own, a model does not do anything. Instead we create a "reference" using a model.
-A reference enables the ODM to interact with Firestore using the model.
-
-To create a reference, we use the `Collection` annotation which is used as a pointer to a collection
-within the Firestore database. For example, the `users` collection in the root of the database
-corresponds to the `Users` model we defined previously:
-
-```dart
-@JsonSerializable(explicitToJson: true)
-class User {
- // ...
-}
-
-@Collection<User>('users')
-final usersRef = UserCollectionReference();
-```
-
-If you are looking to define a model as a reference on a Subcollection, read the [Working with Subcollections](./subcollections.md) documentation.
 
 ## Next Steps
 

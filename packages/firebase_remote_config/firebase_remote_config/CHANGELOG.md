@@ -1,3 +1,39 @@
+## 2.0.20
+
+ - Update a dependency to the latest release.
+
+## 2.0.19
+
+ - Update a dependency to the latest release.
+
+## 2.0.18
+
+ - Update a dependency to the latest release.
+
+## 2.0.17
+
+ - Update a dependency to the latest release.
+
+## 2.0.16
+
+ - **REFACTOR**: update deprecated `Tasks.call()` to `TaskCompletionSource` API ([#9405](https://github.com/firebase/flutterfire/issues/9405)). ([837d68ea](https://github.com/firebase/flutterfire/commit/837d68ea60649fa1fb1c7f8254e4ae67874e9bf2))
+
+## 2.0.15
+
+ - Update a dependency to the latest release.
+
+## 2.0.14
+
+ - Update a dependency to the latest release.
+
+## 2.0.13
+
+ - Update a dependency to the latest release.
+
+## 2.0.12
+
+ - Update a dependency to the latest release.
+
 ## 2.0.11
 
  - **FIX**: bump `firebase_core_platform_interface` version to fix previous release. ([bea70ea5](https://github.com/firebase/flutterfire/commit/bea70ea5cbbb62cbfd2a7a74ae3a07cb12b3ee5a))
@@ -52,7 +88,6 @@
 
 ## 1.0.4
 
- - **FIX**: bump Android `compileSdkVersion` to 31 (#7726). ([a9562bac](https://github.com/firebase/flutterfire/commit/a9562bac60ba927fb3664a47a7f7eaceb277dca6))
 
 ## 1.0.3
 

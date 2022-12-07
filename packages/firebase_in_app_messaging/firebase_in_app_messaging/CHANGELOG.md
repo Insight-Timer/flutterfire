@@ -1,3 +1,40 @@
+## 0.6.0+27
+
+ - Update a dependency to the latest release.
+
+## 0.6.0+26
+
+ - Update a dependency to the latest release.
+
+## 0.6.0+25
+
+ - Update a dependency to the latest release.
+
+## 0.6.0+24
+
+ - Update a dependency to the latest release.
+
+## 0.6.0+23
+
+ - **REFACTOR**: update deprecated `Tasks.call()` to `TaskCompletionSource` API ([#9407](https://github.com/firebase/flutterfire/pull/9407)). ([837d68ea](https://github.com/firebase/flutterfire/commit/bb9b3b23c683d28730a1952f54384caed78674d7))
+ - Update a dependency to the latest release.
+
+## 0.6.0+22
+
+ - Update a dependency to the latest release.
+
+## 0.6.0+21
+
+ - Update a dependency to the latest release.
+
+## 0.6.0+20
+
+ - Update a dependency to the latest release.
+
+## 0.6.0+19
+
+ - Update a dependency to the latest release.
+
 ## 0.6.0+18
 
  - **FIX**: bump `firebase_core_platform_interface` version to fix previous release. ([bea70ea5](https://github.com/firebase/flutterfire/commit/bea70ea5cbbb62cbfd2a7a74ae3a07cb12b3ee5a))
@@ -50,9 +87,6 @@
 
 ## 0.6.0+6
 
- - **FIX**: bump Android `compileSdkVersion` to 31 (#7726). ([a9562bac](https://github.com/firebase/flutterfire/commit/a9562bac60ba927fb3664a47a7f7eaceb277dca6))
- - **FIX**: lazily get the default `FirebaseInAppMessaging` instance on Android to allow for Firebase initialization via Dart only. ([88cfa0c8](https://github.com/firebase/flutterfire/commit/88cfa0c81543f639eb14c75a0d655806d9683bbf))
- - **FIX**: issue where Dart only initialization did not function correctly on iOS. ([5c6feb72](https://github.com/firebase/flutterfire/commit/5c6feb72c446cbe9632ff4ad6b963b63d92aec76))
 
 ## 0.6.0+5
 

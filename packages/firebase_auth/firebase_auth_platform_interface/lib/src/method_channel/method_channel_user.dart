@@ -8,14 +8,16 @@ import 'dart:async';
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:firebase_auth_platform_interface/src/method_channel/method_channel_firebase_auth.dart';
 import 'package:firebase_auth_platform_interface/src/method_channel/method_channel_user_credential.dart';
+import 'package:firebase_auth_platform_interface/src/method_channel/utils/convert_auth_provider.dart';
 
 import 'utils/exception.dart';
 
 /// Method Channel delegate for [UserPlatform] instances.
 class MethodChannelUser extends UserPlatform {
   /// Constructs a new [MethodChannelUser] instance.
-  MethodChannelUser(FirebaseAuthPlatform auth, Map<String, dynamic> data)
-      : super(auth, data);
+  MethodChannelUser(FirebaseAuthPlatform auth, MultiFactorPlatform multiFactor,
+      Map<String, dynamic> data)
+      : super(auth, multiFactor, data);
 
   /// Attaches generic default values to method channel arguments.
   Map<String, dynamic> _withChannelDefaults(Map<String, dynamic> other) {
@@ -99,6 +101,64 @@ class MethodChannelUser extends UserPlatform {
   }
 
   @override
+  Future<UserCredentialPlatform> linkWithProvider(
+    AuthProvider provider,
+  ) async {
+    try {
+      // To extract scopes and custom parameters from the provider
+      final convertedProvider = convertToOAuthProvider(provider);
+
+      Map<String, dynamic> data = (await MethodChannelFirebaseAuth.channel
+          .invokeMapMethod<String, dynamic>(
+              'User#linkWithProvider',
+              _withChannelDefaults({
+                'signInProvider': convertedProvider.providerId,
+                if (convertedProvider is OAuthProvider) ...{
+                  'scopes': convertedProvider.scopes,
+                  'customParameters': convertedProvider.parameters
+                },
+              })))!;
+
+      MethodChannelUserCredential userCredential =
+          MethodChannelUserCredential(auth, data);
+
+      auth.currentUser = userCredential.user;
+      return userCredential;
+    } catch (e, stack) {
+      convertPlatformException(e, stack);
+    }
+  }
+
+  @override
+  Future<UserCredentialPlatform> reauthenticateWithProvider(
+    AuthProvider provider,
+  ) async {
+    try {
+      // To extract scopes and custom parameters from the provider
+      final convertedProvider = convertToOAuthProvider(provider);
+
+      Map<String, dynamic> data = (await MethodChannelFirebaseAuth.channel
+          .invokeMapMethod<String, dynamic>(
+              'User#reauthenticateWithProvider',
+              _withChannelDefaults({
+                'signInProvider': convertedProvider.providerId,
+                if (convertedProvider is OAuthProvider) ...{
+                  'scopes': convertedProvider.scopes,
+                  'customParameters': convertedProvider.parameters
+                },
+              })))!;
+
+      MethodChannelUserCredential userCredential =
+          MethodChannelUserCredential(auth, data);
+
+      auth.currentUser = userCredential.user;
+      return userCredential;
+    } catch (e, stack) {
+      convertPlatformException(e, stack);
+    }
+  }
+
+  @override
   Future<UserCredentialPlatform> reauthenticateWithCredential(
     AuthCredential credential,
   ) async {
@@ -129,7 +189,7 @@ class MethodChannelUser extends UserPlatform {
           .invokeMapMethod<String, dynamic>(
               'User#reload', _withChannelDefaults({})))!;
 
-      MethodChannelUser user = MethodChannelUser(auth, data);
+      MethodChannelUser user = MethodChannelUser(auth, super.multiFactor, data);
       auth.currentUser = user;
       auth.sendAuthChangesEvent(auth.app.name, user);
     } catch (e, stack) {
@@ -188,7 +248,7 @@ class MethodChannelUser extends UserPlatform {
                 },
               )))!;
 
-      MethodChannelUser user = MethodChannelUser(auth, data);
+      MethodChannelUser user = MethodChannelUser(auth, super.multiFactor, data);
       auth.currentUser = user;
       auth.sendAuthChangesEvent(auth.app.name, user);
     } catch (e, stack) {
@@ -208,7 +268,7 @@ class MethodChannelUser extends UserPlatform {
                 },
               )))!;
 
-      MethodChannelUser user = MethodChannelUser(auth, data);
+      MethodChannelUser user = MethodChannelUser(auth, super.multiFactor, data);
       auth.currentUser = user;
       auth.sendAuthChangesEvent(auth.app.name, user);
     } catch (e, stack) {
@@ -228,7 +288,7 @@ class MethodChannelUser extends UserPlatform {
                 },
               )))!;
 
-      MethodChannelUser user = MethodChannelUser(auth, data);
+      MethodChannelUser user = MethodChannelUser(auth, super.multiFactor, data);
       auth.currentUser = user;
       auth.sendAuthChangesEvent(auth.app.name, user);
     } catch (e, stack) {
@@ -248,7 +308,7 @@ class MethodChannelUser extends UserPlatform {
                 },
               )))!;
 
-      MethodChannelUser user = MethodChannelUser(auth, data);
+      MethodChannelUser user = MethodChannelUser(auth, super.multiFactor, data);
       auth.currentUser = user;
       auth.sendAuthChangesEvent(auth.app.name, user);
     } catch (e, stack) {
