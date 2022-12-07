@@ -42,13 +42,8 @@ public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
       FlutterFirebaseMessagingStore.getInstance().storeFirebaseMessage(remoteMessage);
     }
 
-    if (shouldSuspendBrazeNotification(context, remoteMessage)) {
-      Log.i(TAG, "Braze message detected! but notification is suspended.");
-      return;
-    }
-
-    if (isHandledByBraze(context, remoteMessage)) {
-      Log.i(TAG, "Braze message detected! returning...");
+    if (shouldSuspendNotification(context, remoteMessage)) {
+      Log.i(TAG, "Notification is suspended.");
       return;
     }
 
@@ -76,57 +71,7 @@ public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
   public static void setSuspendNotification(boolean suspend, Map<String, String> filters) {
     suspendNotification = suspend;
     suspendNotificationMessageFilters = filters;
-    Log.i(TAG, suspend ? "Braze message suspended": "resumed");
-  }
-
-  /**
-   * This method is used to handle braze related messages via reflection.
-   *
-   * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
-   * @return Wether the message was handled by braze or not.
-   */
-  private Boolean isHandledByBraze(Context context, RemoteMessage remoteMessage) {
-    Method method;
-    Boolean isHandled = false;
-
-    try {
-      Class brazeMessagingService = Class.forName("com.appboy.AppboyFirebaseMessagingService");
-      method =
-          brazeMessagingService.getMethod(
-              "handleBrazeRemoteMessage", Context.class, RemoteMessage.class);
-
-      isHandled = (Boolean) method.invoke(brazeMessagingService, context, remoteMessage);
-
-    } catch (NoSuchMethodException noSuchMethodException) {
-      Log.e(TAG, "method doesn't exist", noSuchMethodException);
-    } catch (Exception exception) {
-      Log.e(TAG, "something went wrong", exception);
-    }
-
-    return isHandled;
-  }
-
-  /**
-   * This method is used to check that remote message is braze related messages via reflection.
-   *
-   * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
-   * @return Wether the message is for braze or not.
-   */
-  private Boolean isBrazePushNotification(RemoteMessage remoteMessage) {
-    Method method;
-    Boolean isBraze = false;
-
-    try {
-      Class brazeMessagingService = Class.forName("com.appboy.AppboyFirebaseMessagingService");
-      method = brazeMessagingService.getMethod("isBrazePushNotification", RemoteMessage.class);
-      isBraze = (Boolean) method.invoke(brazeMessagingService, remoteMessage);
-    } catch (NoSuchMethodException noSuchMethodException) {
-      Log.e(TAG, "method doesn't exist", noSuchMethodException);
-    } catch (Exception exception) {
-      Log.e(TAG, "something went wrong", exception);
-    }
-
-    return isBraze;
+    Log.i(TAG, suspend ? "Notification is suspended": "Notification is resumed");
   }
 
   /**
@@ -136,9 +81,8 @@ public class FlutterFirebaseMessagingReceiver extends BroadcastReceiver {
    * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
    * @return Wether the message is suspended or not
    */
-  private Boolean shouldSuspendBrazeNotification(Context context, final RemoteMessage remoteMessage) {
-    if (isBrazePushNotification(remoteMessage)
-        && FlutterFirebaseMessagingUtils.isApplicationForeground(context)
+  private Boolean shouldSuspendNotification(Context context, final RemoteMessage remoteMessage) {
+    if (FlutterFirebaseMessagingUtils.isApplicationForeground(context)
         && suspendNotification) {
 
       final Map<String, String> remoteMessageData = remoteMessage.getData();
