@@ -482,6 +482,11 @@ public class FlutterFirebaseFirestorePlugin
     return taskCompletionSource.getTask();
   }
 
+  private void setEnableLogging(Map<String, Object> arguments) {
+     boolean enable = (boolean) Objects.requireNonNull(arguments.get("enable"));
+     FirebaseFirestore.setLoggingEnabled(enable);
+  }
+
   @Override
   public void onMethodCall(MethodCall call, @NonNull final MethodChannel.Result result) {
     Task<?> methodCallTask;
@@ -560,6 +565,10 @@ public class FlutterFirebaseFirestorePlugin
       case "Firestore#waitForPendingWrites":
         methodCallTask = waitForPendingWrites(call.arguments());
         break;
+      case "Firestore#enableLogging":
+        setEnableLogging(call.arguments());
+        result.success(true);
+        return;
       default:
         result.notImplemented();
         return;

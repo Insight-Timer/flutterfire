@@ -30,7 +30,6 @@ web, and desktop from a single codebase. Flutter is used by developers and organ
 and open source.
 
 ---
-
 ## Documentation
 
 - [Add Firebase to your Flutter app](https://firebase.google.com/docs/flutter/setup)

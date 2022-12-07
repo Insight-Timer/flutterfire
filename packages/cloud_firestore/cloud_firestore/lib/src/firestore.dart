@@ -290,6 +290,10 @@ class FirebaseFirestore extends FirebasePluginPlatform {
     return _delegate.waitForPendingWrites();
   }
 
+  Future<void> enableLogging(bool enable) {
+    return _delegate.enableLogging(enable);
+  }
+
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) =>

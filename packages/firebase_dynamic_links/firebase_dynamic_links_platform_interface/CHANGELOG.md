@@ -93,7 +93,6 @@
 
 ## 0.2.0+4
 
- - **FIX**: PendingDynamicLinkData.asString() prints out instance type with mapped values. (#7727). ([7d4013fc](https://github.com/firebase/flutterfire/commit/7d4013fcdada2cfebc74cc3bb90734a2fcad1a5c))
 
 ## 0.2.0+3
 
