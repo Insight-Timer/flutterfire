@@ -11,10 +11,11 @@ import 'package:cloud_firestore_platform_interface/src/internal/pointer.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 
+import 'method_channel_aggregate_query.dart';
 import 'method_channel_firestore.dart';
 import 'method_channel_query_snapshot.dart';
-import 'utils/source.dart';
 import 'utils/exception.dart';
+import 'utils/source.dart';
 
 /// An implementation of [QueryPlatform] that uses [MethodChannel] to
 /// communicate with Firebase plugins.
@@ -102,6 +103,9 @@ class MethodChannelQuery extends QueryPlatform {
           'query': this,
           'firestore': firestore,
           'source': getSourceString(options.source),
+          'serverTimestampBehavior': getServerTimestampBehaviorString(
+            options.serverTimestampBehavior,
+          ),
         },
       );
 
@@ -130,6 +134,8 @@ class MethodChannelQuery extends QueryPlatform {
   @override
   Stream<QuerySnapshotPlatform> snapshots({
     bool includeMetadataChanges = false,
+    ServerTimestampBehavior serverTimestampBehavior =
+        ServerTimestampBehavior.none,
   }) {
     // It's fine to let the StreamController be garbage collected once all the
     // subscribers have cancelled; this analyzer warning is safe to ignore.
@@ -149,6 +155,9 @@ class MethodChannelQuery extends QueryPlatform {
           arguments: <String, dynamic>{
             'query': this,
             'includeMetadataChanges': includeMetadataChanges,
+            'serverTimestampBehavior': getServerTimestampBehaviorString(
+              serverTimestampBehavior,
+            ),
           },
           onError: convertPlatformException,
         ).listen(
@@ -210,6 +219,13 @@ class MethodChannelQuery extends QueryPlatform {
     return _copyWithParameters(<String, dynamic>{
       'where': conditions,
     });
+  }
+
+  @override
+  AggregateQueryPlatform count() {
+    return MethodChannelAggregateQuery(
+      this,
+    );
   }
 
   @override

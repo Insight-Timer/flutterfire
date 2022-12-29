@@ -163,33 +163,18 @@ class _$DateTimeQueryDocumentReference extends FirestoreDocumentReference<
 
   @override
   Stream<DateTimeQueryDocumentSnapshot> snapshots() {
-    return reference.snapshots().map((snapshot) {
-      return DateTimeQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference.snapshots().map(DateTimeQueryDocumentSnapshot._);
   }
 
   @override
   Future<DateTimeQueryDocumentSnapshot> get([GetOptions? options]) {
-    return reference.get(options).then((snapshot) {
-      return DateTimeQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference.get(options).then(DateTimeQueryDocumentSnapshot._);
   }
 
   @override
   Future<DateTimeQueryDocumentSnapshot> transactionGet(
       Transaction transaction) {
-    return transaction.get(reference).then((snapshot) {
-      return DateTimeQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return transaction.get(reference).then(DateTimeQueryDocumentSnapshot._);
   }
 
   Future<void> update({
@@ -201,8 +186,9 @@ class _$DateTimeQueryDocumentReference extends FirestoreDocumentReference<
       "Cannot specify both time and timeFieldValue",
     );
     final json = {
-      if (time != _sentinel) 'time': time as DateTime,
-      if (timeFieldValue != null) 'time': timeFieldValue,
+      if (time != _sentinel) _$DateTimeQueryFieldMap['time']!: time as DateTime,
+      if (timeFieldValue != null)
+        _$DateTimeQueryFieldMap['time']!: timeFieldValue,
     };
 
     return reference.update(json);
@@ -218,8 +204,9 @@ class _$DateTimeQueryDocumentReference extends FirestoreDocumentReference<
       "Cannot specify both time and timeFieldValue",
     );
     final json = {
-      if (time != _sentinel) 'time': time as DateTime,
-      if (timeFieldValue != null) 'time': timeFieldValue,
+      if (time != _sentinel) _$DateTimeQueryFieldMap['time']!: time as DateTime,
+      if (timeFieldValue != null)
+        _$DateTimeQueryFieldMap['time']!: timeFieldValue,
     };
 
     transaction.update(reference, json);
@@ -235,27 +222,6 @@ class _$DateTimeQueryDocumentReference extends FirestoreDocumentReference<
 
   @override
   int get hashCode => Object.hash(runtimeType, parent, id);
-}
-
-class DateTimeQueryDocumentSnapshot
-    extends FirestoreDocumentSnapshot<DateTimeQuery> {
-  DateTimeQueryDocumentSnapshot._(
-    this.snapshot,
-    this.data,
-  );
-
-  @override
-  final DocumentSnapshot<DateTimeQuery> snapshot;
-
-  @override
-  DateTimeQueryDocumentReference get reference {
-    return DateTimeQueryDocumentReference(
-      snapshot.reference,
-    );
-  }
-
-  @override
-  final DateTimeQuery? data;
 }
 
 abstract class DateTimeQueryQuery
@@ -393,37 +359,18 @@ class _$DateTimeQueryQuery
 
   final CollectionReference<Object?> _collection;
 
-  DateTimeQueryQuerySnapshot _decodeSnapshot(
-    QuerySnapshot<DateTimeQuery> snapshot,
-  ) {
-    final docs = snapshot.docs.map((e) {
-      return DateTimeQueryQueryDocumentSnapshot._(e, e.data());
-    }).toList();
-
-    final docChanges = snapshot.docChanges.map((change) {
-      return FirestoreDocumentChange<DateTimeQueryDocumentSnapshot>(
-        type: change.type,
-        oldIndex: change.oldIndex,
-        newIndex: change.newIndex,
-        doc: DateTimeQueryDocumentSnapshot._(change.doc, change.doc.data()),
-      );
-    }).toList();
-
-    return DateTimeQueryQuerySnapshot._(
-      snapshot,
-      docs,
-      docChanges,
-    );
-  }
-
   @override
   Stream<DateTimeQueryQuerySnapshot> snapshots([SnapshotOptions? options]) {
-    return reference.snapshots().map(_decodeSnapshot);
+    return reference
+        .snapshots()
+        .map(DateTimeQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
   Future<DateTimeQueryQuerySnapshot> get([GetOptions? options]) {
-    return reference.get(options).then(_decodeSnapshot);
+    return reference
+        .get(options)
+        .then(DateTimeQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
@@ -763,6 +710,24 @@ class _$DateTimeQueryQuery
   int get hashCode => Object.hash(runtimeType, reference);
 }
 
+class DateTimeQueryDocumentSnapshot
+    extends FirestoreDocumentSnapshot<DateTimeQuery> {
+  DateTimeQueryDocumentSnapshot._(this.snapshot) : data = snapshot.data();
+
+  @override
+  final DocumentSnapshot<DateTimeQuery> snapshot;
+
+  @override
+  DateTimeQueryDocumentReference get reference {
+    return DateTimeQueryDocumentReference(
+      snapshot.reference,
+    );
+  }
+
+  @override
+  final DateTimeQuery? data;
+}
+
 class DateTimeQueryQuerySnapshot extends FirestoreQuerySnapshot<DateTimeQuery,
     DateTimeQueryQueryDocumentSnapshot> {
   DateTimeQueryQuerySnapshot._(
@@ -770,6 +735,39 @@ class DateTimeQueryQuerySnapshot extends FirestoreQuerySnapshot<DateTimeQuery,
     this.docs,
     this.docChanges,
   );
+
+  factory DateTimeQueryQuerySnapshot._fromQuerySnapshot(
+    QuerySnapshot<DateTimeQuery> snapshot,
+  ) {
+    final docs =
+        snapshot.docs.map(DateTimeQueryQueryDocumentSnapshot._).toList();
+
+    final docChanges = snapshot.docChanges.map((change) {
+      return _decodeDocumentChange(
+        change,
+        DateTimeQueryDocumentSnapshot._,
+      );
+    }).toList();
+
+    return DateTimeQueryQuerySnapshot._(
+      snapshot,
+      docs,
+      docChanges,
+    );
+  }
+
+  static FirestoreDocumentChange<DateTimeQueryDocumentSnapshot>
+      _decodeDocumentChange<T>(
+    DocumentChange<T> docChange,
+    DateTimeQueryDocumentSnapshot Function(DocumentSnapshot<T> doc) decodeDoc,
+  ) {
+    return FirestoreDocumentChange<DateTimeQueryDocumentSnapshot>(
+      type: docChange.type,
+      oldIndex: docChange.oldIndex,
+      newIndex: docChange.newIndex,
+      doc: decodeDoc(docChange.doc),
+    );
+  }
 
   final QuerySnapshot<DateTimeQuery> snapshot;
 
@@ -783,18 +781,18 @@ class DateTimeQueryQuerySnapshot extends FirestoreQuerySnapshot<DateTimeQuery,
 class DateTimeQueryQueryDocumentSnapshot
     extends FirestoreQueryDocumentSnapshot<DateTimeQuery>
     implements DateTimeQueryDocumentSnapshot {
-  DateTimeQueryQueryDocumentSnapshot._(this.snapshot, this.data);
+  DateTimeQueryQueryDocumentSnapshot._(this.snapshot) : data = snapshot.data();
 
   @override
   final QueryDocumentSnapshot<DateTimeQuery> snapshot;
 
   @override
+  final DateTimeQuery data;
+
+  @override
   DateTimeQueryDocumentReference get reference {
     return DateTimeQueryDocumentReference(snapshot.reference);
   }
-
-  @override
-  final DateTimeQuery data;
 }
 
 /// A collection reference object can be used for adding documents,
@@ -945,33 +943,18 @@ class _$TimestampQueryDocumentReference extends FirestoreDocumentReference<
 
   @override
   Stream<TimestampQueryDocumentSnapshot> snapshots() {
-    return reference.snapshots().map((snapshot) {
-      return TimestampQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference.snapshots().map(TimestampQueryDocumentSnapshot._);
   }
 
   @override
   Future<TimestampQueryDocumentSnapshot> get([GetOptions? options]) {
-    return reference.get(options).then((snapshot) {
-      return TimestampQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference.get(options).then(TimestampQueryDocumentSnapshot._);
   }
 
   @override
   Future<TimestampQueryDocumentSnapshot> transactionGet(
       Transaction transaction) {
-    return transaction.get(reference).then((snapshot) {
-      return TimestampQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return transaction.get(reference).then(TimestampQueryDocumentSnapshot._);
   }
 
   Future<void> update({
@@ -983,8 +966,10 @@ class _$TimestampQueryDocumentReference extends FirestoreDocumentReference<
       "Cannot specify both time and timeFieldValue",
     );
     final json = {
-      if (time != _sentinel) 'time': time as Timestamp,
-      if (timeFieldValue != null) 'time': timeFieldValue,
+      if (time != _sentinel)
+        _$TimestampQueryFieldMap['time']!: time as Timestamp,
+      if (timeFieldValue != null)
+        _$TimestampQueryFieldMap['time']!: timeFieldValue,
     };
 
     return reference.update(json);
@@ -1000,8 +985,10 @@ class _$TimestampQueryDocumentReference extends FirestoreDocumentReference<
       "Cannot specify both time and timeFieldValue",
     );
     final json = {
-      if (time != _sentinel) 'time': time as Timestamp,
-      if (timeFieldValue != null) 'time': timeFieldValue,
+      if (time != _sentinel)
+        _$TimestampQueryFieldMap['time']!: time as Timestamp,
+      if (timeFieldValue != null)
+        _$TimestampQueryFieldMap['time']!: timeFieldValue,
     };
 
     transaction.update(reference, json);
@@ -1017,27 +1004,6 @@ class _$TimestampQueryDocumentReference extends FirestoreDocumentReference<
 
   @override
   int get hashCode => Object.hash(runtimeType, parent, id);
-}
-
-class TimestampQueryDocumentSnapshot
-    extends FirestoreDocumentSnapshot<TimestampQuery> {
-  TimestampQueryDocumentSnapshot._(
-    this.snapshot,
-    this.data,
-  );
-
-  @override
-  final DocumentSnapshot<TimestampQuery> snapshot;
-
-  @override
-  TimestampQueryDocumentReference get reference {
-    return TimestampQueryDocumentReference(
-      snapshot.reference,
-    );
-  }
-
-  @override
-  final TimestampQuery? data;
 }
 
 abstract class TimestampQueryQuery
@@ -1175,37 +1141,18 @@ class _$TimestampQueryQuery
 
   final CollectionReference<Object?> _collection;
 
-  TimestampQueryQuerySnapshot _decodeSnapshot(
-    QuerySnapshot<TimestampQuery> snapshot,
-  ) {
-    final docs = snapshot.docs.map((e) {
-      return TimestampQueryQueryDocumentSnapshot._(e, e.data());
-    }).toList();
-
-    final docChanges = snapshot.docChanges.map((change) {
-      return FirestoreDocumentChange<TimestampQueryDocumentSnapshot>(
-        type: change.type,
-        oldIndex: change.oldIndex,
-        newIndex: change.newIndex,
-        doc: TimestampQueryDocumentSnapshot._(change.doc, change.doc.data()),
-      );
-    }).toList();
-
-    return TimestampQueryQuerySnapshot._(
-      snapshot,
-      docs,
-      docChanges,
-    );
-  }
-
   @override
   Stream<TimestampQueryQuerySnapshot> snapshots([SnapshotOptions? options]) {
-    return reference.snapshots().map(_decodeSnapshot);
+    return reference
+        .snapshots()
+        .map(TimestampQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
   Future<TimestampQueryQuerySnapshot> get([GetOptions? options]) {
-    return reference.get(options).then(_decodeSnapshot);
+    return reference
+        .get(options)
+        .then(TimestampQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
@@ -1545,6 +1492,24 @@ class _$TimestampQueryQuery
   int get hashCode => Object.hash(runtimeType, reference);
 }
 
+class TimestampQueryDocumentSnapshot
+    extends FirestoreDocumentSnapshot<TimestampQuery> {
+  TimestampQueryDocumentSnapshot._(this.snapshot) : data = snapshot.data();
+
+  @override
+  final DocumentSnapshot<TimestampQuery> snapshot;
+
+  @override
+  TimestampQueryDocumentReference get reference {
+    return TimestampQueryDocumentReference(
+      snapshot.reference,
+    );
+  }
+
+  @override
+  final TimestampQuery? data;
+}
+
 class TimestampQueryQuerySnapshot extends FirestoreQuerySnapshot<TimestampQuery,
     TimestampQueryQueryDocumentSnapshot> {
   TimestampQueryQuerySnapshot._(
@@ -1552,6 +1517,39 @@ class TimestampQueryQuerySnapshot extends FirestoreQuerySnapshot<TimestampQuery,
     this.docs,
     this.docChanges,
   );
+
+  factory TimestampQueryQuerySnapshot._fromQuerySnapshot(
+    QuerySnapshot<TimestampQuery> snapshot,
+  ) {
+    final docs =
+        snapshot.docs.map(TimestampQueryQueryDocumentSnapshot._).toList();
+
+    final docChanges = snapshot.docChanges.map((change) {
+      return _decodeDocumentChange(
+        change,
+        TimestampQueryDocumentSnapshot._,
+      );
+    }).toList();
+
+    return TimestampQueryQuerySnapshot._(
+      snapshot,
+      docs,
+      docChanges,
+    );
+  }
+
+  static FirestoreDocumentChange<TimestampQueryDocumentSnapshot>
+      _decodeDocumentChange<T>(
+    DocumentChange<T> docChange,
+    TimestampQueryDocumentSnapshot Function(DocumentSnapshot<T> doc) decodeDoc,
+  ) {
+    return FirestoreDocumentChange<TimestampQueryDocumentSnapshot>(
+      type: docChange.type,
+      oldIndex: docChange.oldIndex,
+      newIndex: docChange.newIndex,
+      doc: decodeDoc(docChange.doc),
+    );
+  }
 
   final QuerySnapshot<TimestampQuery> snapshot;
 
@@ -1566,18 +1564,18 @@ class TimestampQueryQuerySnapshot extends FirestoreQuerySnapshot<TimestampQuery,
 class TimestampQueryQueryDocumentSnapshot
     extends FirestoreQueryDocumentSnapshot<TimestampQuery>
     implements TimestampQueryDocumentSnapshot {
-  TimestampQueryQueryDocumentSnapshot._(this.snapshot, this.data);
+  TimestampQueryQueryDocumentSnapshot._(this.snapshot) : data = snapshot.data();
 
   @override
   final QueryDocumentSnapshot<TimestampQuery> snapshot;
 
   @override
+  final TimestampQuery data;
+
+  @override
   TimestampQueryDocumentReference get reference {
     return TimestampQueryDocumentReference(snapshot.reference);
   }
-
-  @override
-  final TimestampQuery data;
 }
 
 /// A collection reference object can be used for adding documents,
@@ -1728,33 +1726,18 @@ class _$GeoPointQueryDocumentReference extends FirestoreDocumentReference<
 
   @override
   Stream<GeoPointQueryDocumentSnapshot> snapshots() {
-    return reference.snapshots().map((snapshot) {
-      return GeoPointQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference.snapshots().map(GeoPointQueryDocumentSnapshot._);
   }
 
   @override
   Future<GeoPointQueryDocumentSnapshot> get([GetOptions? options]) {
-    return reference.get(options).then((snapshot) {
-      return GeoPointQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference.get(options).then(GeoPointQueryDocumentSnapshot._);
   }
 
   @override
   Future<GeoPointQueryDocumentSnapshot> transactionGet(
       Transaction transaction) {
-    return transaction.get(reference).then((snapshot) {
-      return GeoPointQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return transaction.get(reference).then(GeoPointQueryDocumentSnapshot._);
   }
 
   Future<void> update({
@@ -1766,8 +1749,10 @@ class _$GeoPointQueryDocumentReference extends FirestoreDocumentReference<
       "Cannot specify both point and pointFieldValue",
     );
     final json = {
-      if (point != _sentinel) 'point': point as GeoPoint,
-      if (pointFieldValue != null) 'point': pointFieldValue,
+      if (point != _sentinel)
+        _$GeoPointQueryFieldMap['point']!: point as GeoPoint,
+      if (pointFieldValue != null)
+        _$GeoPointQueryFieldMap['point']!: pointFieldValue,
     };
 
     return reference.update(json);
@@ -1783,8 +1768,10 @@ class _$GeoPointQueryDocumentReference extends FirestoreDocumentReference<
       "Cannot specify both point and pointFieldValue",
     );
     final json = {
-      if (point != _sentinel) 'point': point as GeoPoint,
-      if (pointFieldValue != null) 'point': pointFieldValue,
+      if (point != _sentinel)
+        _$GeoPointQueryFieldMap['point']!: point as GeoPoint,
+      if (pointFieldValue != null)
+        _$GeoPointQueryFieldMap['point']!: pointFieldValue,
     };
 
     transaction.update(reference, json);
@@ -1800,27 +1787,6 @@ class _$GeoPointQueryDocumentReference extends FirestoreDocumentReference<
 
   @override
   int get hashCode => Object.hash(runtimeType, parent, id);
-}
-
-class GeoPointQueryDocumentSnapshot
-    extends FirestoreDocumentSnapshot<GeoPointQuery> {
-  GeoPointQueryDocumentSnapshot._(
-    this.snapshot,
-    this.data,
-  );
-
-  @override
-  final DocumentSnapshot<GeoPointQuery> snapshot;
-
-  @override
-  GeoPointQueryDocumentReference get reference {
-    return GeoPointQueryDocumentReference(
-      snapshot.reference,
-    );
-  }
-
-  @override
-  final GeoPointQuery? data;
 }
 
 abstract class GeoPointQueryQuery
@@ -1958,37 +1924,18 @@ class _$GeoPointQueryQuery
 
   final CollectionReference<Object?> _collection;
 
-  GeoPointQueryQuerySnapshot _decodeSnapshot(
-    QuerySnapshot<GeoPointQuery> snapshot,
-  ) {
-    final docs = snapshot.docs.map((e) {
-      return GeoPointQueryQueryDocumentSnapshot._(e, e.data());
-    }).toList();
-
-    final docChanges = snapshot.docChanges.map((change) {
-      return FirestoreDocumentChange<GeoPointQueryDocumentSnapshot>(
-        type: change.type,
-        oldIndex: change.oldIndex,
-        newIndex: change.newIndex,
-        doc: GeoPointQueryDocumentSnapshot._(change.doc, change.doc.data()),
-      );
-    }).toList();
-
-    return GeoPointQueryQuerySnapshot._(
-      snapshot,
-      docs,
-      docChanges,
-    );
-  }
-
   @override
   Stream<GeoPointQueryQuerySnapshot> snapshots([SnapshotOptions? options]) {
-    return reference.snapshots().map(_decodeSnapshot);
+    return reference
+        .snapshots()
+        .map(GeoPointQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
   Future<GeoPointQueryQuerySnapshot> get([GetOptions? options]) {
-    return reference.get(options).then(_decodeSnapshot);
+    return reference
+        .get(options)
+        .then(GeoPointQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
@@ -2328,6 +2275,24 @@ class _$GeoPointQueryQuery
   int get hashCode => Object.hash(runtimeType, reference);
 }
 
+class GeoPointQueryDocumentSnapshot
+    extends FirestoreDocumentSnapshot<GeoPointQuery> {
+  GeoPointQueryDocumentSnapshot._(this.snapshot) : data = snapshot.data();
+
+  @override
+  final DocumentSnapshot<GeoPointQuery> snapshot;
+
+  @override
+  GeoPointQueryDocumentReference get reference {
+    return GeoPointQueryDocumentReference(
+      snapshot.reference,
+    );
+  }
+
+  @override
+  final GeoPointQuery? data;
+}
+
 class GeoPointQueryQuerySnapshot extends FirestoreQuerySnapshot<GeoPointQuery,
     GeoPointQueryQueryDocumentSnapshot> {
   GeoPointQueryQuerySnapshot._(
@@ -2335,6 +2300,39 @@ class GeoPointQueryQuerySnapshot extends FirestoreQuerySnapshot<GeoPointQuery,
     this.docs,
     this.docChanges,
   );
+
+  factory GeoPointQueryQuerySnapshot._fromQuerySnapshot(
+    QuerySnapshot<GeoPointQuery> snapshot,
+  ) {
+    final docs =
+        snapshot.docs.map(GeoPointQueryQueryDocumentSnapshot._).toList();
+
+    final docChanges = snapshot.docChanges.map((change) {
+      return _decodeDocumentChange(
+        change,
+        GeoPointQueryDocumentSnapshot._,
+      );
+    }).toList();
+
+    return GeoPointQueryQuerySnapshot._(
+      snapshot,
+      docs,
+      docChanges,
+    );
+  }
+
+  static FirestoreDocumentChange<GeoPointQueryDocumentSnapshot>
+      _decodeDocumentChange<T>(
+    DocumentChange<T> docChange,
+    GeoPointQueryDocumentSnapshot Function(DocumentSnapshot<T> doc) decodeDoc,
+  ) {
+    return FirestoreDocumentChange<GeoPointQueryDocumentSnapshot>(
+      type: docChange.type,
+      oldIndex: docChange.oldIndex,
+      newIndex: docChange.newIndex,
+      doc: decodeDoc(docChange.doc),
+    );
+  }
 
   final QuerySnapshot<GeoPointQuery> snapshot;
 
@@ -2348,18 +2346,18 @@ class GeoPointQueryQuerySnapshot extends FirestoreQuerySnapshot<GeoPointQuery,
 class GeoPointQueryQueryDocumentSnapshot
     extends FirestoreQueryDocumentSnapshot<GeoPointQuery>
     implements GeoPointQueryDocumentSnapshot {
-  GeoPointQueryQueryDocumentSnapshot._(this.snapshot, this.data);
+  GeoPointQueryQueryDocumentSnapshot._(this.snapshot) : data = snapshot.data();
 
   @override
   final QueryDocumentSnapshot<GeoPointQuery> snapshot;
 
   @override
+  final GeoPointQuery data;
+
+  @override
   GeoPointQueryDocumentReference get reference {
     return GeoPointQueryDocumentReference(snapshot.reference);
   }
-
-  @override
-  final GeoPointQuery data;
 }
 
 /// A collection reference object can be used for adding documents,
@@ -2514,33 +2512,22 @@ class _$DocumentReferenceQueryDocumentReference
 
   @override
   Stream<DocumentReferenceQueryDocumentSnapshot> snapshots() {
-    return reference.snapshots().map((snapshot) {
-      return DocumentReferenceQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference.snapshots().map(DocumentReferenceQueryDocumentSnapshot._);
   }
 
   @override
   Future<DocumentReferenceQueryDocumentSnapshot> get([GetOptions? options]) {
-    return reference.get(options).then((snapshot) {
-      return DocumentReferenceQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return reference
+        .get(options)
+        .then(DocumentReferenceQueryDocumentSnapshot._);
   }
 
   @override
   Future<DocumentReferenceQueryDocumentSnapshot> transactionGet(
       Transaction transaction) {
-    return transaction.get(reference).then((snapshot) {
-      return DocumentReferenceQueryDocumentSnapshot._(
-        snapshot,
-        snapshot.data(),
-      );
-    });
+    return transaction
+        .get(reference)
+        .then(DocumentReferenceQueryDocumentSnapshot._);
   }
 
   Future<void> update({
@@ -2553,8 +2540,10 @@ class _$DocumentReferenceQueryDocumentReference
     );
     final json = {
       if (ref != _sentinel)
-        'ref': ref as DocumentReference<Map<String, dynamic>>,
-      if (refFieldValue != null) 'ref': refFieldValue,
+        _$DocumentReferenceQueryFieldMap['ref']!:
+            ref as DocumentReference<Map<String, dynamic>>,
+      if (refFieldValue != null)
+        _$DocumentReferenceQueryFieldMap['ref']!: refFieldValue,
     };
 
     return reference.update(json);
@@ -2571,8 +2560,10 @@ class _$DocumentReferenceQueryDocumentReference
     );
     final json = {
       if (ref != _sentinel)
-        'ref': ref as DocumentReference<Map<String, dynamic>>,
-      if (refFieldValue != null) 'ref': refFieldValue,
+        _$DocumentReferenceQueryFieldMap['ref']!:
+            ref as DocumentReference<Map<String, dynamic>>,
+      if (refFieldValue != null)
+        _$DocumentReferenceQueryFieldMap['ref']!: refFieldValue,
     };
 
     transaction.update(reference, json);
@@ -2588,27 +2579,6 @@ class _$DocumentReferenceQueryDocumentReference
 
   @override
   int get hashCode => Object.hash(runtimeType, parent, id);
-}
-
-class DocumentReferenceQueryDocumentSnapshot
-    extends FirestoreDocumentSnapshot<DocumentReferenceQuery> {
-  DocumentReferenceQueryDocumentSnapshot._(
-    this.snapshot,
-    this.data,
-  );
-
-  @override
-  final DocumentSnapshot<DocumentReferenceQuery> snapshot;
-
-  @override
-  DocumentReferenceQueryDocumentReference get reference {
-    return DocumentReferenceQueryDocumentReference(
-      snapshot.reference,
-    );
-  }
-
-  @override
-  final DocumentReferenceQuery? data;
 }
 
 abstract class DocumentReferenceQueryQuery
@@ -2748,39 +2718,19 @@ class _$DocumentReferenceQueryQuery extends QueryReference<
 
   final CollectionReference<Object?> _collection;
 
-  DocumentReferenceQueryQuerySnapshot _decodeSnapshot(
-    QuerySnapshot<DocumentReferenceQuery> snapshot,
-  ) {
-    final docs = snapshot.docs.map((e) {
-      return DocumentReferenceQueryQueryDocumentSnapshot._(e, e.data());
-    }).toList();
-
-    final docChanges = snapshot.docChanges.map((change) {
-      return FirestoreDocumentChange<DocumentReferenceQueryDocumentSnapshot>(
-        type: change.type,
-        oldIndex: change.oldIndex,
-        newIndex: change.newIndex,
-        doc: DocumentReferenceQueryDocumentSnapshot._(
-            change.doc, change.doc.data()),
-      );
-    }).toList();
-
-    return DocumentReferenceQueryQuerySnapshot._(
-      snapshot,
-      docs,
-      docChanges,
-    );
-  }
-
   @override
   Stream<DocumentReferenceQueryQuerySnapshot> snapshots(
       [SnapshotOptions? options]) {
-    return reference.snapshots().map(_decodeSnapshot);
+    return reference
+        .snapshots()
+        .map(DocumentReferenceQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
   Future<DocumentReferenceQueryQuerySnapshot> get([GetOptions? options]) {
-    return reference.get(options).then(_decodeSnapshot);
+    return reference
+        .get(options)
+        .then(DocumentReferenceQueryQuerySnapshot._fromQuerySnapshot);
   }
 
   @override
@@ -3121,6 +3071,25 @@ class _$DocumentReferenceQueryQuery extends QueryReference<
   int get hashCode => Object.hash(runtimeType, reference);
 }
 
+class DocumentReferenceQueryDocumentSnapshot
+    extends FirestoreDocumentSnapshot<DocumentReferenceQuery> {
+  DocumentReferenceQueryDocumentSnapshot._(this.snapshot)
+      : data = snapshot.data();
+
+  @override
+  final DocumentSnapshot<DocumentReferenceQuery> snapshot;
+
+  @override
+  DocumentReferenceQueryDocumentReference get reference {
+    return DocumentReferenceQueryDocumentReference(
+      snapshot.reference,
+    );
+  }
+
+  @override
+  final DocumentReferenceQuery? data;
+}
+
 class DocumentReferenceQueryQuerySnapshot extends FirestoreQuerySnapshot<
     DocumentReferenceQuery, DocumentReferenceQueryQueryDocumentSnapshot> {
   DocumentReferenceQueryQuerySnapshot._(
@@ -3128,6 +3097,41 @@ class DocumentReferenceQueryQuerySnapshot extends FirestoreQuerySnapshot<
     this.docs,
     this.docChanges,
   );
+
+  factory DocumentReferenceQueryQuerySnapshot._fromQuerySnapshot(
+    QuerySnapshot<DocumentReferenceQuery> snapshot,
+  ) {
+    final docs = snapshot.docs
+        .map(DocumentReferenceQueryQueryDocumentSnapshot._)
+        .toList();
+
+    final docChanges = snapshot.docChanges.map((change) {
+      return _decodeDocumentChange(
+        change,
+        DocumentReferenceQueryDocumentSnapshot._,
+      );
+    }).toList();
+
+    return DocumentReferenceQueryQuerySnapshot._(
+      snapshot,
+      docs,
+      docChanges,
+    );
+  }
+
+  static FirestoreDocumentChange<DocumentReferenceQueryDocumentSnapshot>
+      _decodeDocumentChange<T>(
+    DocumentChange<T> docChange,
+    DocumentReferenceQueryDocumentSnapshot Function(DocumentSnapshot<T> doc)
+        decodeDoc,
+  ) {
+    return FirestoreDocumentChange<DocumentReferenceQueryDocumentSnapshot>(
+      type: docChange.type,
+      oldIndex: docChange.oldIndex,
+      newIndex: docChange.newIndex,
+      doc: decodeDoc(docChange.doc),
+    );
+  }
 
   final QuerySnapshot<DocumentReferenceQuery> snapshot;
 
@@ -3142,18 +3146,19 @@ class DocumentReferenceQueryQuerySnapshot extends FirestoreQuerySnapshot<
 class DocumentReferenceQueryQueryDocumentSnapshot
     extends FirestoreQueryDocumentSnapshot<DocumentReferenceQuery>
     implements DocumentReferenceQueryDocumentSnapshot {
-  DocumentReferenceQueryQueryDocumentSnapshot._(this.snapshot, this.data);
+  DocumentReferenceQueryQueryDocumentSnapshot._(this.snapshot)
+      : data = snapshot.data();
 
   @override
   final QueryDocumentSnapshot<DocumentReferenceQuery> snapshot;
 
   @override
+  final DocumentReferenceQuery data;
+
+  @override
   DocumentReferenceQueryDocumentReference get reference {
     return DocumentReferenceQueryDocumentReference(snapshot.reference);
   }
-
-  @override
-  final DocumentReferenceQuery data;
 }
 
 // **************************************************************************
