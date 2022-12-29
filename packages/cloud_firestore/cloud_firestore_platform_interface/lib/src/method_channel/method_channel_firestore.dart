@@ -103,6 +103,9 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
           'name': name,
           'firestore': FirebaseFirestorePlatform.instance,
           'source': getSourceString(options.source),
+          'serverTimestampBehavior': getServerTimestampBehaviorString(
+            options.serverTimestampBehavior,
+          ),
         },
       );
 
@@ -325,6 +328,19 @@ class MethodChannelFirebaseFirestore extends FirebaseFirestorePlatform {
       await channel.invokeMethod<void>(
           'Firestore#waitForPendingWrites', <String, dynamic>{
         'firestore': this,
+      });
+    } catch (e, stack) {
+      convertPlatformException(e, stack);
+    }
+  }
+
+  @override
+  Future<void> setIndexConfiguration(String indexConfiguration) async {
+    try {
+      await channel.invokeMethod<void>(
+          'Firestore#setIndexConfiguration', <String, dynamic>{
+        'firestore': this,
+        'indexConfiguration': indexConfiguration,
       });
     } catch (e, stack) {
       convertPlatformException(e, stack);
