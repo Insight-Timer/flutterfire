@@ -19,6 +19,8 @@ void setupInstanceTests() {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+      await FirebaseStorage.instance
+          .useStorageEmulator(testEmulatorHost, testEmulatorPort);
       storage = FirebaseStorage.instance;
       secondaryApp = await testInitializeSecondaryApp();
     });

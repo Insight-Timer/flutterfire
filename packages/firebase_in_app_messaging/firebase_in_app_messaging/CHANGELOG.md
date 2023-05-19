@@ -1,3 +1,48 @@
+## 0.7.3+1
+
+ - Update a dependency to the latest release.
+
+## 0.7.3
+
+ - **FEAT**: update dependency constraints to `sdk: '>=2.18.0 <4.0.0'` `flutter: '>=3.3.0'` ([#10946](https://github.com/firebase/flutterfire/issues/10946)). ([2772d10f](https://github.com/firebase/flutterfire/commit/2772d10fe510dcc28ec2d37a26b266c935699fa6))
+
+## 0.7.2
+
+ - **FIX**: add support for AGP 8.0 ([#10901](https://github.com/firebase/flutterfire/issues/10901)). ([a3b96735](https://github.com/firebase/flutterfire/commit/a3b967354294c295a9be8d699a6adb7f4b1dba7f))
+ - **FEAT**: upgrade to dart 3 compatible dependencies ([#10890](https://github.com/firebase/flutterfire/issues/10890)). ([4bd7e59b](https://github.com/firebase/flutterfire/commit/4bd7e59b1f2b09a2230c49830159342dd4592041))
+
+## 0.7.1+1
+
+ - Update a dependency to the latest release.
+
+## 0.7.1
+
+ - **FEAT**: bump dart sdk constraint to 2.18 ([#10618](https://github.com/firebase/flutterfire/issues/10618)). ([f80948a2](https://github.com/firebase/flutterfire/commit/f80948a28b62eead358bdb900d5a0dfb97cebb33))
+
+## 0.7.0+16
+
+ - Update a dependency to the latest release.
+
+## 0.7.0+15
+
+ - Update a dependency to the latest release.
+
+## 0.7.0+14
+
+ - Update a dependency to the latest release.
+
+## 0.7.0+13
+
+ - Update a dependency to the latest release.
+
+## 0.7.0+12
+
+ - Update a dependency to the latest release.
+
+## 0.7.0+11
+
+ - Update a dependency to the latest release.
+
 ## 0.7.0+10
 
  - Update a dependency to the latest release.
@@ -133,9 +178,6 @@
 
 ## 0.6.0+6
 
- - **FIX**: bump Android `compileSdkVersion` to 31 (#7726). ([a9562bac](https://github.com/firebase/flutterfire/commit/a9562bac60ba927fb3664a47a7f7eaceb277dca6))
- - **FIX**: lazily get the default `FirebaseInAppMessaging` instance on Android to allow for Firebase initialization via Dart only. ([88cfa0c8](https://github.com/firebase/flutterfire/commit/88cfa0c81543f639eb14c75a0d655806d9683bbf))
- - **FIX**: issue where Dart only initialization did not function correctly on iOS. ([5c6feb72](https://github.com/firebase/flutterfire/commit/5c6feb72c446cbe9632ff4ad6b963b63d92aec76))
 
 ## 0.6.0+5
 

@@ -7,13 +7,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'auth.dart';
-import 'profile.dart';
-
 import 'firebase_options.dart';
+import 'profile.dart';
 
 /// Requires that a Firebase local emulator is running locally.
 /// See https://firebase.flutter.dev/docs/auth/start/#optional-prototype-and-test-with-firebase-local-emulator-suite
 bool shouldUseFirebaseEmulator = false;
+
+late final FirebaseApp app;
+late final FirebaseAuth auth;
 
 // Requires that the Firebase Auth emulator is running locally
 // e.g via `melos run firebase:emulator`.
@@ -22,12 +24,14 @@ Future<void> main() async {
   // We're using the manual installation on non-web platforms since Google sign in plugin doesn't yet support Dart initialization.
   // See related issue: https://github.com/flutter/flutter/issues/96391
 
-  await Firebase.initializeApp(
+  // We store the app and auth to make testing with a named instance easier.
+  app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  auth = FirebaseAuth.instanceFor(app: app);
 
   if (shouldUseFirebaseEmulator) {
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    await auth.useAuthEmulator('localhost', 9099);
   }
 
   runApp(const AuthExampleApp());
@@ -61,7 +65,7 @@ class AuthExampleApp extends StatelessWidget {
                           children: [
                             Text(
                               'Firebase Auth Desktop',
-                              style: Theme.of(context).textTheme.headline4,
+                              style: Theme.of(context).textTheme.headlineMedium,
                             ),
                           ],
                         ),
@@ -74,7 +78,7 @@ class AuthExampleApp extends StatelessWidget {
                       ? constraints.maxWidth / 2
                       : constraints.maxWidth,
                   child: StreamBuilder<User?>(
-                    stream: FirebaseAuth.instance.authStateChanges(),
+                    stream: auth.authStateChanges(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return const ProfilePage();
