@@ -126,7 +126,7 @@ class AuthFlow<T extends AuthProvider> extends ValueNotifier<AuthState>
 
   @override
   void onCredentialLinked(AuthCredential credential) {
-    value = CredentialLinked(credential);
+    value = CredentialLinked(credential, auth.currentUser!);
   }
 
   @override
@@ -144,7 +144,11 @@ class AuthFlow<T extends AuthProvider> extends ValueNotifier<AuthState>
 
   @override
   void onSignedIn(UserCredential credential) {
-    value = SignedIn(credential.user);
+    if (credential.additionalUserInfo?.isNewUser ?? false) {
+      value = UserCreated(credential);
+    } else {
+      value = SignedIn(credential.user);
+    }
   }
 
   @override
