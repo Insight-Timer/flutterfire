@@ -43,6 +43,7 @@ import io.flutter.plugins.firebase.firestore.streamhandler.SnapshotsInSyncStream
 import io.flutter.plugins.firebase.firestore.streamhandler.TransactionStreamHandler;
 import io.flutter.plugins.firebase.firestore.utils.ExceptionConverter;
 import io.flutter.plugins.firebase.firestore.utils.ServerTimestampBehaviorConverter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -365,6 +366,24 @@ public class FlutterFirebaseFirestorePlugin
     return taskCompletionSource.getTask();
   }
 
+  private Task<Void> setLoggingEnabled(Map<String, Object> arguments) {
+    TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
+
+    cachedThreadPool.execute(
+        () -> {
+          try {
+            boolean loggingEnabled = (boolean) Objects.requireNonNull(arguments.get("enabled"));
+
+            FirebaseFirestore.setLoggingEnabled(loggingEnabled);
+            taskCompletionSource.setResult(null);
+          } catch (Exception e) {
+            taskCompletionSource.setException(e);
+          }
+        });
+
+    return taskCompletionSource.getTask();
+  }
+
   private void saveTimestampBehavior(Map<String, Object> arguments, int hashCode) {
     String serverTimestampBehaviorString = (String) arguments.get("serverTimestampBehavior");
     DocumentSnapshot.ServerTimestampBehavior serverTimestampBehavior =
@@ -420,10 +439,25 @@ public class FlutterFirebaseFirestorePlugin
             DocumentReference documentReference =
                 (DocumentReference) Objects.requireNonNull(arguments.get("reference"));
             @SuppressWarnings("unchecked")
-            Map<String, Object> data =
-                (Map<String, Object>) Objects.requireNonNull(arguments.get("data"));
+            Map<FieldPath, Object> data =
+                (Map<FieldPath, Object>) Objects.requireNonNull(arguments.get("data"));
 
-            taskCompletionSource.setResult(Tasks.await(documentReference.update(data)));
+            // Due to the signature of the function, I extract the first element of the map and
+            // pass the rest of the map as an array of alternating keys and values.
+            FieldPath firstFieldPath = data.keySet().iterator().next();
+            Object firstObject = data.get(firstFieldPath);
+
+            ArrayList<Object> flattenData = new ArrayList<>();
+            for (FieldPath fieldPath : data.keySet()) {
+              if (fieldPath.equals(firstFieldPath)) {
+                continue;
+              }
+              flattenData.add(fieldPath);
+              flattenData.add(data.get(fieldPath));
+            }
+            taskCompletionSource.setResult(
+                Tasks.await(
+                    documentReference.update(firstFieldPath, firstObject, flattenData.toArray())));
           } catch (Exception e) {
             taskCompletionSource.setException(e);
           }
@@ -611,6 +645,9 @@ public class FlutterFirebaseFirestorePlugin
         return;
       case "Firestore#namedQueryGet":
         methodCallTask = namedQueryGet(call.arguments());
+        break;
+      case "Firestore#setLoggingEnabled":
+        methodCallTask = setLoggingEnabled(call.arguments());
         break;
       case "DocumentReference#get":
         methodCallTask = documentGet(call.arguments());

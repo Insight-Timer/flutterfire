@@ -9,7 +9,6 @@ import static io.flutter.plugins.firebase.core.FlutterFirebasePluginRegistry.reg
 import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.perf.metrics.HttpMetric;
@@ -51,7 +50,7 @@ public class FlutterFirebasePerformancePlugin
   }
 
   @Override
-  public void onDetachedFromEngine(FlutterPluginBinding binding) {
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     if (channel != null) {
       channel.setMethodCallHandler(null);
       channel = null;
@@ -99,7 +98,6 @@ public class FlutterFirebasePerformancePlugin
     return taskCompletionSource.getTask();
   }
 
-  @SuppressWarnings("ConstantConditions")
   private Task<Void> setPerformanceCollectionEnabled(MethodCall call) {
     TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
 
@@ -117,14 +115,13 @@ public class FlutterFirebasePerformancePlugin
     return taskCompletionSource.getTask();
   }
 
-  @SuppressWarnings("ConstantConditions")
   private Task<Integer> traceStart(MethodCall call) {
     TaskCompletionSource<Integer> taskCompletionSource = new TaskCompletionSource<>();
 
     cachedThreadPool.execute(
         () -> {
           try {
-            final String name = call.argument("name");
+            final String name = Objects.requireNonNull(call.argument("name"));
             final Trace trace = FirebasePerformance.getInstance().newTrace(name);
             trace.start();
             final int traceHandle = _traceHandle++;
@@ -138,7 +135,6 @@ public class FlutterFirebasePerformancePlugin
     return taskCompletionSource.getTask();
   }
 
-  @SuppressWarnings("ConstantConditions")
   private Task<Void> traceStop(MethodCall call) {
     TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
 
@@ -151,14 +147,25 @@ public class FlutterFirebasePerformancePlugin
             final Map<String, Object> metrics = Objects.requireNonNull((call.argument("metrics")));
             final Trace trace = _traces.get(traceHandle);
 
+            if (trace == null) {
+              taskCompletionSource.setResult(null);
+              return;
+            }
+
             for (String key : attributes.keySet()) {
               String attributeValue = (String) attributes.get(key);
+              if (attributeValue == null) {
+                continue;
+              }
 
               trace.putAttribute(key, attributeValue);
             }
 
             for (String key : metrics.keySet()) {
               Integer metricValue = (Integer) metrics.get(key);
+              if (metricValue == null) {
+                continue;
+              }
 
               trace.putMetric(key, metricValue);
             }
@@ -198,7 +205,6 @@ public class FlutterFirebasePerformancePlugin
     return taskCompletionSource.getTask();
   }
 
-  @SuppressWarnings("ConstantConditions")
   private Task<Void> httpMetricStop(MethodCall call) {
     TaskCompletionSource<Void> taskCompletionSource = new TaskCompletionSource<>();
 
@@ -215,6 +221,12 @@ public class FlutterFirebasePerformancePlugin
 
             final HttpMetric httpMetric = _httpMetrics.get(httpMetricHandle);
 
+            if (httpMetric == null) {
+              // If httpMetric is null, it means that the httpMetric has already been stopped.
+              taskCompletionSource.setResult(null);
+              return;
+            }
+
             if (httpResponseCode != null) {
               httpMetric.setHttpResponseCode(httpResponseCode);
             }
@@ -230,6 +242,9 @@ public class FlutterFirebasePerformancePlugin
 
             for (String key : attributes.keySet()) {
               String attributeValue = (String) attributes.get(key);
+              if (attributeValue == null) {
+                continue;
+              }
 
               httpMetric.putAttribute(key, attributeValue);
             }
@@ -289,7 +304,18 @@ public class FlutterFirebasePerformancePlugin
 
   @Override
   public Task<Map<String, Object>> getPluginConstantsForFirebaseApp(FirebaseApp firebaseApp) {
-    return Tasks.call(() -> new HashMap<String, Object>() {});
+    TaskCompletionSource<Map<String, Object>> taskCompletionSource = new TaskCompletionSource<>();
+
+    cachedThreadPool.execute(
+        () -> {
+          try {
+            taskCompletionSource.setResult(new HashMap<String, Object>() {});
+          } catch (Exception e) {
+            taskCompletionSource.setException(e);
+          }
+        });
+
+    return taskCompletionSource.getTask();
   }
 
   @Override

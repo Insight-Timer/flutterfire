@@ -11,6 +11,7 @@ import 'package:firebase_ui_oauth_apple/firebase_ui_oauth_apple.dart';
 import 'package:firebase_ui_oauth_facebook/firebase_ui_oauth_facebook.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:firebase_ui_oauth_twitter/firebase_ui_oauth_twitter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -32,10 +33,6 @@ final emailLinkProviderConfig = EmailLinkAuthProvider(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  if (FirebaseAuth.instance.currentUser == null) {
-    await FirebaseAuth.instance.signInAnonymously();
-  }
 
   FirebaseUIAuth.configureProviders([
     EmailAuthProvider(),
@@ -65,12 +62,12 @@ class LabelOverrides extends DefaultLocalizations {
 }
 
 class FirebaseAuthUIExample extends StatelessWidget {
-  const FirebaseAuthUIExample({Key? key}) : super(key: key);
+  const FirebaseAuthUIExample({super.key});
 
   String get initialRoute {
     final auth = FirebaseAuth.instance;
 
-    if (auth.currentUser == null || auth.currentUser!.isAnonymous) {
+    if (auth.currentUser == null) {
       return '/';
     }
 
@@ -107,6 +104,7 @@ class FirebaseAuthUIExample extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         visualDensity: VisualDensity.standard,
+        useMaterial3: true,
         inputDecorationTheme: const InputDecorationTheme(
           border: OutlineInputBorder(),
         ),
@@ -260,6 +258,8 @@ class FirebaseAuthUIExample extends StatelessWidget {
           );
         },
         '/profile': (context) {
+          final platform = Theme.of(context).platform;
+
           return ProfileScreen(
             actions: [
               SignedOutAction((context) {
@@ -268,7 +268,9 @@ class FirebaseAuthUIExample extends StatelessWidget {
               mfaAction,
             ],
             actionCodeSettings: actionCodeSettings,
-            showMFATile: true,
+            showMFATile: kIsWeb ||
+                platform == TargetPlatform.iOS ||
+                platform == TargetPlatform.android,
           );
         },
       },

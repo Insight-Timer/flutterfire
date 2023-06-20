@@ -5,7 +5,7 @@
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show AuthCredential, MultiFactorResolver, User;
+    show AuthCredential, MultiFactorResolver, User, UserCredential;
 
 /// An abstract class for all auth states.
 /// [AuthState] transitions could be captured with an [AuthStateChangeAction]:
@@ -146,6 +146,14 @@ class SignedIn extends AuthState {
   SignedIn(this.user);
 }
 
+/// A state that indicates that a new user account was created.
+class UserCreated extends AuthState {
+  /// A [UserCredential] that was obtained during authentication process.
+  final UserCredential credential;
+
+  UserCreated(this.credential);
+}
+
 /// {@template ui.auth.auth_state.different_sign_in_methods_found}
 /// An [AuthState] that indicates that there are different auth providers
 /// associated with an email that was used to authenticate.
@@ -193,10 +201,10 @@ class AuthStateProvider extends InheritedWidget {
   final AuthState state;
 
   const AuthStateProvider({
-    Key? key,
+    super.key,
+    required super.child,
     required this.state,
-    required Widget child,
-  }) : super(key: key, child: child);
+  });
 
   @override
   bool updateShouldNotify(AuthStateProvider oldWidget) {
@@ -256,10 +264,10 @@ class AuthStateListener<T extends AuthController> extends StatelessWidget {
   final AuthStateListenerCallback<T> listener;
 
   const AuthStateListener({
-    Key? key,
+    super.key,
     required this.child,
     required this.listener,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

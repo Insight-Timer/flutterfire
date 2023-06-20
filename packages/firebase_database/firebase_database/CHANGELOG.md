@@ -1,3 +1,59 @@
+## 10.2.3
+
+ - Update a dependency to the latest release.
+
+## 10.2.2
+
+ - Update a dependency to the latest release.
+
+## 10.2.1
+
+ - Update a dependency to the latest release.
+
+## 10.2.0
+
+ - **FEAT**: update dependency constraints to `sdk: '>=2.18.0 <4.0.0'` `flutter: '>=3.3.0'` ([#10946](https://github.com/firebase/flutterfire/issues/10946)). ([2772d10f](https://github.com/firebase/flutterfire/commit/2772d10fe510dcc28ec2d37a26b266c935699fa6))
+
+## 10.1.2
+
+ - **FIX**: add support for AGP 8.0 ([#10901](https://github.com/firebase/flutterfire/issues/10901)). ([a3b96735](https://github.com/firebase/flutterfire/commit/a3b967354294c295a9be8d699a6adb7f4b1dba7f))
+
+## 10.1.1
+
+ - Update a dependency to the latest release.
+
+## 10.1.0
+
+ - **FEAT**: bump dart sdk constraint to 2.18 ([#10618](https://github.com/firebase/flutterfire/issues/10618)). ([f80948a2](https://github.com/firebase/flutterfire/commit/f80948a28b62eead358bdb900d5a0dfb97cebb33))
+
+## 10.0.16
+
+ - Update a dependency to the latest release.
+
+## 10.0.15
+
+ - Update a dependency to the latest release.
+
+## 10.0.14
+
+ - Update a dependency to the latest release.
+
+## 10.0.13
+
+ - Update a dependency to the latest release.
+
+## 10.0.12
+
+ - Update a dependency to the latest release.
+
+## 10.0.11
+
+ - **DOCS**: remove duplicate wording in documentation ([#10229](https://github.com/firebase/flutterfire/issues/10229)). ([d4feb22e](https://github.com/firebase/flutterfire/commit/d4feb22e06899f0db9923264b5345e538a07fbac))
+
+## 10.0.10
+
+ - **REFACTOR**: upgrade project to remove warnings from Flutter 3.7 ([#10344](https://github.com/firebase/flutterfire/issues/10344)). ([e0087c84](https://github.com/firebase/flutterfire/commit/e0087c845c7526c11a4241a26d39d4673b0ad29d))
+
 ## 10.0.9
 
  - Update a dependency to the latest release.

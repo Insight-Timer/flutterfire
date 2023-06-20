@@ -14,7 +14,7 @@ class FirebaseWebService {
   /// property allows overriding of web naming to Flutterfire plugin naming.
   String? override;
 
-  /// Function to call to ensure the Firebase Service is initalized.
+  /// Function to call to ensure the Firebase Service is initialized.
   /// Usually used to ensure that the Web SDK match the behavior
   /// of native SDKs.
   EnsurePluginInitialized ensurePluginInitialized;
@@ -27,7 +27,9 @@ class FirebaseWebService {
   });
 }
 
-typedef EnsurePluginInitialized = Future<void> Function()?;
+typedef EnsurePluginInitialized = Future<void> Function(
+  firebase.App firebaseApp,
+)?;
 
 /// The entry point for accessing Firebase.
 ///
@@ -35,20 +37,19 @@ typedef EnsurePluginInitialized = Future<void> Function()?;
 class FirebaseCoreWeb extends FirebasePlatform {
   static Map<String, FirebaseWebService> _services = {
     'core': FirebaseWebService._('app', override: 'core'),
-    'app-check': FirebaseWebService._('app-check', override: 'app_check'),
-    'remote-config':
-        FirebaseWebService._('remote-config', override: 'remote_config'),
   };
 
   /// Internally registers a Firebase Service to be initialized.
   static void registerService(
-    String service, [
+    String service, {
+    String? productNameOverride,
     EnsurePluginInitialized? ensurePluginInitialized,
-  ]) {
+  }) {
     _services.putIfAbsent(
       service,
       () => FirebaseWebService._(
         service,
+        override: productNameOverride,
         ensurePluginInitialized: ensurePluginInitialized,
       ),
     );
@@ -64,13 +65,14 @@ class FirebaseCoreWeb extends FirebasePlatform {
   /// You can override the supported version by attaching a version string to
   /// the window (window.flutterfire_web_sdk_version = 'x.x.x'). Do so at your
   /// own risk as the version might be unsupported or untested against.
-  String get _firebaseSDKVersion {
+  @visibleForTesting
+  String get firebaseSDKVersion {
     return context['flutterfire_web_sdk_version'] ??
         supportedFirebaseJsSdkVersion;
   }
 
   /// Returns a list of services which won't be automatically injected on
-  /// initilization. This is useful incases where you wish to manually include
+  /// initialization. This is useful incases where you wish to manually include
   /// the scripts (e.g. in countries where you must request the users permission
   /// to include Analytics).
   ///
@@ -96,20 +98,45 @@ class FirebaseCoreWeb extends FirebasePlatform {
     return [];
   }
 
+  final String _defaultTrustedPolicyName = 'flutterfire-';
+
   /// Injects a `script` with a `src` dynamically into the head of the current
   /// document.
-  Future<void> _injectSrcScript(String src, String windowVar) async {
+  @visibleForTesting
+  Future<void> injectSrcScript(String src, String windowVar) async {
+    DomTrustedScriptUrl? trustedUrl;
+    final trustedPolicyName = _defaultTrustedPolicyName + windowVar;
+    if (trustedTypes != null) {
+      console.debug(
+        'TrustedTypes available. Creating policy:',
+        trustedPolicyName,
+      );
+      final DomTrustedTypePolicyFactory factory = trustedTypes!;
+      try {
+        final DomTrustedTypePolicy policy = factory.createPolicy(
+          trustedPolicyName,
+          DomTrustedTypePolicyOptions(
+            createScriptURL: allowInterop((String url) => src),
+          ),
+        );
+        trustedUrl = policy.createScriptURL(src);
+      } catch (e) {
+        rethrow;
+      }
+    }
     ScriptElement script = ScriptElement();
     script.type = 'text/javascript';
     script.crossOrigin = 'anonymous';
     script.text = '''
       window.ff_trigger_$windowVar = async (callback) => {
-        callback(await import("$src"));
+        console.debug("Initializing Firebase $windowVar");
+        callback(await import("${trustedUrl != null ? callMethod(trustedUrl, 'toString', []) : src}"));
       };
     ''';
 
     assert(document.head != null);
     document.head!.append(script);
+
     Completer completer = Completer();
 
     context.callMethod('ff_trigger_$windowVar', [
@@ -132,7 +159,7 @@ class FirebaseCoreWeb extends FirebasePlatform {
       return;
     }
 
-    String version = _firebaseSDKVersion;
+    String version = firebaseSDKVersion;
     List<String> ignored = _ignoredServiceScripts;
 
     await Future.wait(
@@ -141,7 +168,7 @@ class FirebaseCoreWeb extends FirebasePlatform {
           return Future.value();
         }
 
-        return _injectSrcScript(
+        return injectSrcScript(
           'https://www.gstatic.com/firebasejs/$version/firebase-${service.name}.js',
           'firebase_${service.override ?? service.name}',
         );
@@ -276,11 +303,11 @@ class FirebaseCoreWeb extends FirebasePlatform {
       _services.values.map((service) {
         final ensureInitializedFunction = service.ensurePluginInitialized;
 
-        if (ensureInitializedFunction == null) {
+        if (ensureInitializedFunction == null || app == null) {
           return Future.value();
         }
 
-        return ensureInitializedFunction();
+        return ensureInitializedFunction(app);
       }),
     );
 

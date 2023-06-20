@@ -213,11 +213,9 @@ external bool snapshotEqual(
 @JS()
 external PromiseJsImpl<void> terminate(FirestoreJsImpl firestore);
 
+// Object type is forced to prevent JS interop from ignoring the value
 @JS()
-external PromiseJsImpl<void> updateDoc(
-  DocumentReferenceJsImpl reference,
-  dynamic data,
-);
+external Object get updateDoc;
 
 @JS()
 external PromiseJsImpl<void> waitForPendingWrites(FirestoreJsImpl firestore);
@@ -229,6 +227,16 @@ external QueryConstraintJsImpl where(
   dynamic value,
 );
 
+// Object type is forced to prevent JS interop from ignoring the value
+// when using it with an arbitrary number of arguments
+@JS()
+external Object get or;
+
+// Object type is forced to prevent JS interop from ignoring the value
+// when using it with an arbitrary number of arguments
+@JS()
+external Object get and;
+
 @JS()
 external WriteBatchJsImpl writeBatch(FirestoreJsImpl firestore);
 
@@ -239,7 +247,6 @@ abstract class FirestoreJsImpl {
 
 // TODO how?
 //   external void settings(Settings settings);
-
 }
 
 @JS('WriteBatch')
@@ -480,7 +487,8 @@ abstract class TimestampJsImpl {
 @anonymous
 @JS()
 abstract class FirestoreError {
-  external String /*|'cancelled'|'unknown'|'invalid-argument'|'deadline-exceeded'|'not-found'|'already-exists'|'permission-denied'|'resource-exhausted'|'failed-precondition'|'aborted'|'out-of-range'|'unimplemented'|'internal'|'unavailable'|'data-loss'|'unauthenticated'*/ get code;
+  external String /*|'cancelled'|'unknown'|'invalid-argument'|'deadline-exceeded'|'not-found'|'already-exists'|'permission-denied'|'resource-exhausted'|'failed-precondition'|'aborted'|'out-of-range'|'unimplemented'|'internal'|'unavailable'|'data-loss'|'unauthenticated'*/
+      get code;
 
   external set code(
       /*|'cancelled'|'unknown'|'invalid-argument'|'deadline-exceeded'|'not-found'|'already-exists'|'permission-denied'|'resource-exhausted'|'failed-precondition'|'aborted'|'out-of-range'|'unimplemented'|'internal'|'unavailable'|'data-loss'|'unauthenticated'*/

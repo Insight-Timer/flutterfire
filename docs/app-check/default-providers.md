@@ -18,7 +18,7 @@ only your app can access your project's Firebase resources. See an
     already done so.
 
 1.  Register your apps to use App Check with the Play Integrity, Device Check, and reCAPTCHA providers in the
-    [**Project Settings > App Check**](https://console.firebase.google.com/project/_/settings/appcheck)
+    [**Project Settings > App Check**](https://console.firebase.google.com/project/_/appcheck)
     section of the Firebase console.
 
     You usually need to register all of your project's apps, because once you
@@ -81,10 +81,17 @@ Future<void> main() async {
     webRecaptchaSiteKey: 'recaptcha-v3-site-key',
     // Default provider for Android is the Play Integrity provider. You can use the "AndroidProvider" enum to choose
     // your preferred provider. Choose from:
-    // 1. debug provider
-    // 2. safety net provider
-    // 3. play integrity provider
+    // 1. Debug provider
+    // 2. Safety Net provider
+    // 3. Play Integrity provider
     androidProvider: AndroidProvider.debug,
+    // Default provider for iOS/macOS is the Device Check provider. You can use the "AppleProvider" enum to choose
+        // your preferred provider. Choose from:
+        // 1. Debug provider
+        // 2. Device Check provider
+        // 3. App Attest provider
+        // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
+    appleProvider: AppleProvider.appAttest,
   );
   runApp(App());
 }
@@ -111,7 +118,7 @@ To help make this decision, you can look at App Check metrics for the
 services you use:
 
 - [Monitor App Check request metrics](/docs/app-check/monitor-metrics) for
-  Realtime Database, Cloud Firestore, and Cloud Storage.
+  Realtime Database, Cloud Firestore, Cloud Storage, and Authentication.
 - [Monitor App Check request metrics for Cloud Functions](/docs/app-check/monitor-functions-metrics).
 
 ### Enable App Check enforcement {:#enforce}
@@ -120,7 +127,7 @@ When you understand how App Check will affect your users and you're ready to
 proceed, you can enable App Check enforcement:
 
 - [Enable App Check enforcement](/docs/app-check/enable-enforcement) for
-  Realtime Database, Cloud Firestore, and Cloud Storage.
+  Realtime Database, Cloud Firestore, Cloud Storage, and Authentication.
 - [Enable App Check enforcement for Cloud Functions](/docs/app-check/cloud-functions).
 
 ### Use App Check in debug environments {:#debug}
