@@ -504,6 +504,15 @@ public class FlutterFirebaseMessagingPlugin
       case "Messaging#getNotificationSettings":
         methodCallTask = getPermissions();
         break;
+      case "Messaging#suspendNotification":
+        Map<String, String> filters = ((Map<String, String>) call.arguments);
+        FlutterFirebaseMessagingReceiver.setSuspendNotification(true, filters);
+        result.success(null);
+        return;
+      case "Messaging#resumeNotification":
+        FlutterFirebaseMessagingReceiver.setSuspendNotification(false, null);
+        result.success(null);
+        return;
       default:
         result.notImplemented();
         return;

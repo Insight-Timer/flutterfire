@@ -321,4 +321,15 @@ abstract class FirebaseMessagingPlatform extends PlatformInterface {
       'setDeliveryMetricsExportToBigQuery() is not implemented',
     );
   }
+
+  /// suspend notification
+  Future<void> suspendNotification(
+      {required Map<String, String> messageFilters}) {
+    throw UnimplementedError('suspendNotification() is not implemented');
+  }
+
+  /// resume notification
+  Future<void> resumeNotification() {
+    throw UnimplementedError('resumeNotification() is not implemented');
+  }
 }

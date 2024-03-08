@@ -189,4 +189,14 @@ class FirebaseMessagingWeb extends FirebaseMessagingPlatform {
       https://firebase.google.com/docs/cloud-messaging/js/topic-messaging
     ''');
   }
+
+  @override
+  Future<void> suspendNotification({Map<String, String> messageFilters}) {
+    throw UnimplementedError('suspendNotification() is not implemented');
+  }
+
+  @override
+  Future<void> resumeNotification() {
+    throw UnimplementedError('resumeNotification() is not implemented');
+  }
 }
