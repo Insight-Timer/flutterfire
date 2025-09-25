@@ -231,6 +231,24 @@ class FirebaseAuth extends FirebasePluginPlatform {
     );
   }
 
+  /// Returns a list of sign-in methods that can be used to sign in a given
+  /// user (identified by its main email address).
+  ///
+  /// This method is useful when you support multiple authentication mechanisms
+  /// if you want to implement an email-first authentication flow.
+  ///
+  /// An empty `List` is returned if the user could not be found.
+  ///
+  /// A [FirebaseAuthException] maybe thrown with the following error code:
+  /// - **invalid-email**:
+  ///  - Thrown if the email address is not valid.
+  @Deprecated('fetchSignInMethodsForEmail() has been deprecated. '
+      'Migrating off of this method is recommended as a security best-practice. Learn more in the Identity Platform documentation: '
+      ' https://cloud.google.com/identity-platform/docs/admin/email-enumeration-protection.')
+  Future<List<String>> fetchSignInMethodsForEmail(String email) {
+    return _delegate.fetchSignInMethodsForEmail(email);
+  }
+
   /// Returns a UserCredential from the redirect-based sign-in flow.
   ///
   /// If sign-in succeeded, returns the signed in user. If sign-in was
@@ -451,7 +469,7 @@ class FirebaseAuth extends FirebasePluginPlatform {
   ///  - Thrown if there already exists an account with the email address
   ///    asserted by the credential.
   // ignore: deprecated_member_use_from_same_package
-  ///    Resolve this by asking
+  ///    Resolve this by calling [fetchSignInMethodsForEmail] and then asking
   ///    the user to sign in using one of the returned providers.
   ///    Once the user is signed in, the original credential can be linked to
   ///    the user with [linkWithCredential].
