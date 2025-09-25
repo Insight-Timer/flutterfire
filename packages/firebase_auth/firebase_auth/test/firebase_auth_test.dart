@@ -348,6 +348,17 @@ void main() {
       });
     });
 
+    group('fetchSignInMethodsForEmail()', () {
+      test('should call delegate method', () async {
+        // Necessary as we otherwise get a "null is not a Future<void>" error
+        when(mockAuthPlatform.fetchSignInMethodsForEmail(any))
+            .thenAnswer((i) async => []);
+        // ignore: deprecated_member_use_from_same_package
+        await auth.fetchSignInMethodsForEmail(kMockEmail);
+        verify(mockAuthPlatform.fetchSignInMethodsForEmail(kMockEmail));
+      });
+    });
+
     group('getRedirectResult()', () {
       test('should call delegate method', () async {
         // Necessary as we otherwise get a "null is not a Future<void>" error
@@ -1038,6 +1049,15 @@ class MockFirebaseAuth extends Mock
       Invocation.method(#confirmPasswordReset, [code, newPassword]),
       returnValue: neverEndingFuture<void>(),
       returnValueForMissingStub: neverEndingFuture<void>(),
+    );
+  }
+
+  @override
+  Future<List<String>> fetchSignInMethodsForEmail(String? email) {
+    return super.noSuchMethod(
+      Invocation.method(#checkActionCode, [email]),
+      returnValue: neverEndingFuture<List<String>>(),
+      returnValueForMissingStub: neverEndingFuture<List<String>>(),
     );
   }
 
